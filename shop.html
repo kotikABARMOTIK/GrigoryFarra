@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин - Garden Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="js/settings-manager.js"></script>
+    <script src="theme-manager.js"></script>
+    <script src="lang.js"></script>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #2E7D32;
+            --primary-light: #E8F5E9;
+            --accent: #FF4081;
+            --text: #333333;
+            --text-light: #666666;
+            --background: #F9F9F9;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --radius: 16px;
+        }
+
+        [data-theme="dark"] {
+            --primary: #66bb6a;
+            --primary-dark: #388e3c;
+            --primary-light: #1b5e20;
+            --text: #ffffff;
+            --text-light: #b0b0b0;
+            --background: #121212;
+            --card-bg: #1e1e1e;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --border: #333333;
+        }
+
+        [data-theme="green"] {
+            --primary: #4CAF50;
+            --primary-dark: #2E7D32;
+            --primary-light: #E8F5E9;
+            --text: #1B5E20;
+            --text-light: #4CAF50;
+            --background: #F1F8E9;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(76, 175, 80, 0.15);
+            --border: #C8E6C9;
+        }
+
+        [data-theme="blue"] {
+            --primary: #2196F3;
+            --primary-dark: #1976D2;
+            --primary-light: #E3F2FD;
+            --text: #0D47A1;
+            --text-light: #2196F3;
+            --background: #E3F2FD;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(33, 150, 243, 0.15);
+            --border: #BBDEFB;
+        }
+
+        [data-theme="green"].dark-mode {
+            --primary: #66bb6a;
+            --primary-dark: #388e3c;
+            --primary-light: #1b5e20;
+            --text: #e8f5e9;
+            --text-light: #a5d6a7;
+            --background: #1b311c;
+            --card-bg: #2e4630;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --border: #1b5e20;
+        }
+
+        [data-theme="blue"].dark-mode {
+            --primary: #64b5f6;
+            --primary-dark: #1976d2;
+            --primary-light: #0d47a1;
+            --text: #e3f2fd;
+            --text-light: #90caf9;
+            --background: #0d1b33;
+            --card-bg: #1e2b47;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --border: #1565c0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+       body {
+            background: var(--background);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+
+        header {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .logo-icon {
+            font-size: 2em;
+            color: var(--primary);
+        }
+
+.nav-menu {
+            display: flex;
+            gap: 20px;
+            margin-right: 90px;
+        }
+
+        .nav-item {
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: var(--primary-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-stats {
+            background: var(--primary-light);
+            padding: 10px 15px;
+            border-radius: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .shop-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .shop-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .shop-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3em;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+
+        .shop-subtitle {
+            color: var(--text-light);
+            font-size: 1.2em;
+        }
+
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--primary);
+            border-radius: 25px;
+            background: var(--card-bg);
+            color: var(--primary-dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .category-btn.active, .category-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .search-box {
+            max-width: 400px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid var(--border);
+            border-radius: 25px;
+            background: var(--card-bg);
+            color: var(--text);
+            font-size: 1em;
+            padding-left: 45px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            text-align: center;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.2);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .product-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-name {
+            font-size: 1.3em;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .product-price {
+            font-size: 1.2em;
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .product-description {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .buy-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .buy-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .buy-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .inventory {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .inventory-title {
+            font-size: 1.5em;
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .inventory-item {
+            background: var(--primary-light);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.2s ease;
+            border: 1px solid var(--border);
+        }
+
+        .inventory-item:hover {
+            transform: scale(1.05);
+        }
+
+        .empty-inventory {
+            text-align: center;
+            color: var(--text-light);
+            padding: 40px;
+            font-style: italic;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--radius);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .modal-title {
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .modal-message {
+            color: var(--text);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--text-light);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 15px 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .user-stats {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .shop-title {
+                font-size: 2em;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .inventory-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo" onclick="window.location.href='main-site.html'">
+            <div class="logo-icon">🌿</div>
+            <div class="logo-text">Garden Game</div>
+        </div>
+        
+        <div class="nav-menu">
+            <a href="main-site.html" class="nav-item">Главная</a>
+            <a href="profile.html" class="nav-item">Профиль</a>
+            <a href="shop.html" class="nav-item active">Магазин</a>
+            <a href="friends.html" class="nav-item">Друзья</a>
+            <a href="games.html" class="nav-item">Игры</a>
+            <a href="settings.html" class="nav-item">Настройки</a>
+        </div>
+        
+        <div class="user-info">
+            <div class="user-stats">
+                <div class="stat">
+                    <i class="fas fa-coins"></i>
+                    <span id="userCoins">100</span>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-seedling"></i>
+                    <span id="userPlants">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="shop-container">
+        <div class="shop-header">
+            <h1 class="shop-title">Магазин растений</h1>
+            <p class="shop-subtitle">Приобретайте красивые растения и украшения для вашего сада</p>
+        </div>
+
+        <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Поиск растений..." oninput="searchProducts(this.value)">
+        </div>
+
+        <div class="categories">
+            <button class="category-btn active" onclick="filterCategory('all')">Все товары</button>
+            <button class="category-btn" onclick="filterCategory('plants')">Растения</button>
+            <button class="category-btn" onclick="filterCategory('decor')">Украшения</button>
+            <button class="category-btn" onclick="filterCategory('tools')">Инструменты</button>
+            <button class="category-btn" onclick="filterCategory('seeds')">Семена</button>
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+            <!-- Товары будут загружены через JavaScript -->
+        </div>
+
+        <div class="inventory">
+            <h2 class="inventory-title">Ваша коллекция</h2>
+            <div class="inventory-grid" id="inventoryGrid">
+                <!-- Инвентарь будет загружен через JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <div id="purchaseModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="modalTitle">Покупка товара</h3>
+            <p class="modal-message" id="modalMessage"></p>
+            <div>
+                <button onclick="confirmPurchase()" class="btn btn-primary">Подтвердить</button>
+                <button onclick="closeModal()" class="btn btn-secondary">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+        const products = [
+            { id: 1, name: "Красная роза", icon: "🌹", price: 50, category: "plants", description: "Классическая красная роза с насыщенным ароматом", rarity: "common" },
+            { id: 2, name: "Тюльпан", icon: "🌷", price: 30, category: "plants", description: "Яркий весенний тюльпан различных цветов", rarity: "common" },
+            { id: 3, name: "Подсолнух", icon: "🌻", price: 40, category: "plants", description: "Солнечный подсолнух для вашего сада", rarity: "common" },
+            { id: 4, name: "Орхидея", icon: "🌸", price: 75, category: "plants", description: "Экзотическая орхидея с нежными цветами", rarity: "rare" },
+            { id: 5, name: "Кактус", icon: "🌵", price: 25, category: "plants", description: "Неприхотливый кактус для начинающих", rarity: "common" },
+            { id: 6, name: "Садовые ножницы", icon: "✂️", price: 80, category: "tools", description: "Профессиональные ножницы для ухода", rarity: "common" },
+            { id: 7, name: "Лейка", icon: "🚰", price: 25, category: "tools", description: "Удобная пластиковая лейка 2л", rarity: "common" },
+            { id: 8, name: "Садовый гном", icon: "🧙", price: 100, category: "decor", description: "Веселый садовый гном для украшения", rarity: "uncommon" },
+            { id: 9, name: "Скамейка", icon: "🪑", price: 150, category: "decor", description: "Деревянная скамейка для отдыха в саду", rarity: "uncommon" },
+            { id: 10, name: "Семена роз", icon: "🌱", price: 20, category: "seeds", description: "Набор семян для выращивания роз", rarity: "common" },
+            { id: 11, name: "Семена овощей", icon: "🥕", price: 15, category: "seeds", description: "Смесь семян овощей для огорода", rarity: "common" },
+            { id: 12, name: "Золотая роза", icon: "🏵️", price: 200, category: "plants", description: "Эксклюзивная золотая роза", rarity: "epic" }
+        ];
+
+        const rarityColors = {
+            common: "#4CAF50",
+            uncommon: "#2196F3",
+            rare: "#9C27B0",
+            epic: "#FF9800"
+        };
+
+        let currentUser = null;
+        let selectedProduct = null;
+        let currentCategory = 'all';
+        let searchQuery = '';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (!currentUser) {
+                window.location.href = 'registration.html';
+                return;
+            }
+
+            applyThemeSettings();
+            loadUserStats();
+            displayProducts('all');
+            loadInventory();
+        });
+
+        function loadUserStats() {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const userData = users.find(u => u.email === currentUser.email);
+            
+            if (userData) {
+                document.getElementById('userCoins').textContent = userData.coins || 100;
+                const plantsCount = userData.plants ? userData.plants.length : 0;
+                document.getElementById('userPlants').textContent = plantsCount;
+            }
+        }
+
+        function displayProducts(category) {
+            currentCategory = category;
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            let filteredProducts = category === 'all' ? products : products.filter(p => p.category === category);
+            
+            // Применяем поиск если есть запрос
+            if (searchQuery) {
+                filteredProducts = filteredProducts.filter(product => 
+                    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    product.description.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+            }
+
+            const userData = getUserData();
+
+            if (filteredProducts.length === 0) {
+                grid.innerHTML = '<div class="empty-inventory">Товары не найдены</div>';
+                return;
+            }
+
+            filteredProducts.forEach(product => {
+                const owned = userData.plants ? userData.plants.some(p => p.id === product.id) : false;
+                const canAfford = userData.coins >= product.price;
+
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                
+                let badgeHTML = '';
+                if (product.rarity !== 'common') {
+                    badgeHTML = `<div class="product-badge" style="background: ${rarityColors[product.rarity]}">${product.rarity}</div>`;
+                }
+
+                productCard.innerHTML = `
+                    ${badgeHTML}
+                    <div class="product-icon">${product.icon}</div>
+                    <h3 class="product-name">${product.name}</h3>
+                    <div class="product-price">${product.price} <i class="fas fa-coins"></i></div>
+                    <p class="product-description">${product.description}</p>
+                    <button class="buy-btn" onclick="attemptPurchase(${product.id})" 
+                            ${owned || !canAfford ? 'disabled' : ''}>
+                        ${owned ? '<i class="fas fa-check"></i> Куплено' : 
+                          canAfford ? '<i class="fas fa-shopping-cart"></i> Купить' : 
+                          '<i class="fas fa-lock"></i> Недостаточно монет'}
+                    </button>
+                `;
+                grid.appendChild(productCard);
+            });
+        }
+
+        function filterCategory(category) {
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            displayProducts(category);
+        }
+
+        function searchProducts(query) {
+            searchQuery = query;
+            displayProducts(currentCategory);
+        }
+
+        function attemptPurchase(productId) {
+            selectedProduct = products.find(p => p.id === productId);
+            const userData = getUserData();
+
+            if (userData.coins >= selectedProduct.price) {
+                document.getElementById('modalTitle').textContent = `Покупка: ${selectedProduct.name}`;
+                document.getElementById('modalMessage').textContent = 
+                    `Стоимость: ${selectedProduct.price} монет\nУ вас останется: ${userData.coins - selectedProduct.price} монет`;
+                document.getElementById('purchaseModal').style.display = 'flex';
+            }
+        }
+
+        function confirmPurchase() {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const userIndex = users.findIndex(u => u.email === currentUser.email);
+            
+            if (userIndex !== -1) {
+                if (!users[userIndex].coins) users[userIndex].coins = 100;
+                users[userIndex].coins -= selectedProduct.price;
+                
+                if (!users[userIndex].plants) {
+                    users[userIndex].plants = [];
+                }
+                
+                // Проверяем, нет ли уже этого товара
+                if (!users[userIndex].plants.some(p => p.id === selectedProduct.id)) {
+                    users[userIndex].plants.push(selectedProduct);
+                }
+                
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                closeModal();
+                loadUserStats();
+                displayProducts(currentCategory);
+                loadInventory();
+                
+                showNotification(`Поздравляем! Вы приобрели ${selectedProduct.name}!`);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('purchaseModal').style.display = 'none';
+            selectedProduct = null;
+        }
+
+        function loadInventory() {
+            const grid = document.getElementById('inventoryGrid');
+            grid.innerHTML = '';
+
+            const userData = getUserData();
+            const userPlants = userData.plants || [];
+
+            if (userPlants.length === 0) {
+                grid.innerHTML = '<div class="empty-inventory">У вас пока нет растений. Посетите магазин!</div>';
+                return;
+            }
+
+            userPlants.forEach(plant => {
+                const item = document.createElement('div');
+                item.className = 'inventory-item';
+                item.innerHTML = `
+                    <div style="font-size: 2em;">${plant.icon}</div>
+                    <div style="font-weight: 600; margin-top: 5px;">${plant.name}</div>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        function getUserData() {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            return users.find(u => u.email === currentUser.email) || { coins: 100, plants: [] };
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function applyThemeSettings() {
+            const settings = JSON.parse(localStorage.getItem('appSettings')) || {};
+            
+            if (settings.theme) {
+                document.body.setAttribute('data-theme', settings.theme);
+                
+                if (settings.darkMode && settings.theme !== 'dark') {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            }
+            
+            if (settings.fontSize) {
+                document.body.style.fontSize = settings.fontSize + 'px';
+            }
+            if (settings.fontFamily) {
+                document.body.style.fontFamily = settings.fontFamily + ', sans-serif';
+            }
+        }
+
+        // Закрытие модального окна при клике вне его
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('purchaseModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

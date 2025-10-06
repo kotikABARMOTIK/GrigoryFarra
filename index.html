@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flower Garden Authentication</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #2E7D32;
+            --primary-light: #E8F5E9;
+            --text: #333333;
+            --text-light: #666666;
+            --background: #F9F9F9;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --radius: 16px;
+            --border: #e0e0e0;
+        }
+
+        /* Темная тема */
+        [data-theme="dark"] {
+            --primary: #66bb6a;
+            --primary-dark: #388e3c;
+            --primary-light: #1b5e20;
+            --text: #ffffff;
+            --text-light: #b0b0b0;
+            --background: #121212;
+            --card-bg: #1e1e1e;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --border: #333333;
+        }
+
+        /* Зеленая тема */
+        [data-theme="green"] {
+            --primary: #4CAF50;
+            --primary-dark: #2E7D32;
+            --primary-light: #E8F5E9;
+            --text: #1B5E20;
+            --text-light: #4CAF50;
+            --background: #F1F8E9;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(76, 175, 80, 0.15);
+            --border: #C8E6C9;
+        }
+
+        /* Синяя тема */
+        [data-theme="blue"] {
+            --primary: #2196F3;
+            --primary-dark: #1976D2;
+            --primary-light: #E3F2FD;
+            --text: #0D47A1;
+            --text-light: #2196F3;
+            --background: #E3F2FD;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(33, 150, 243, 0.15);
+            --border: #BBDEFB;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Flower decorations */
+        .flower {
+            position: absolute;
+            z-index: 0;
+            opacity: 0.7;
+            font-size: 2em;
+        }
+
+        .flower-1 {
+            top: 10%;
+            left: 10%;
+            color: var(--primary);
+            transform: rotate(-15deg);
+        }
+
+        .flower-2 {
+            bottom: 15%;
+            right: 10%;
+            color: var(--primary);
+            transform: rotate(25deg);
+        }
+
+        .flower-3 {
+            top: 20%;
+            right: 15%;
+            color: var(--primary);
+            transform: rotate(10deg);
+        }
+
+        .flower-4 {
+            bottom: 20%;
+            left: 15%;
+            color: var(--primary);
+            transform: rotate(-20deg);
+        }
+
+        .petal {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            border-radius: 50% 50% 50% 0;
+            opacity: 0.6;
+            animation: fall 15s linear infinite;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 0.7; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        .auth-container {
+            background: var(--card-bg);
+            padding: 40px;
+            margin-left: 350px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            border: 1px solid var(--border);
+        }
+
+        .game-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.2em;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: inline-block;
+        }
+
+        .game-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            border-radius: 3px;
+        }
+
+        .auth-title {
+            font-size: 1.8em;
+            color: var(--primary);
+            margin-bottom: 35px;
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+
+        .auth-title:after {
+            content: '✿';
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5em;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--primary-dark);
+            font-size: 1em;
+            font-weight: 600;
+            padding-left: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px 20px 16px 45px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: var(--primary-light);
+            color: var(--text);
+            cursor: text;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--card-bg);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.3);
+        }
+
+        input:hover {
+            border-color: var(--primary);
+        }
+
+        input::placeholder {
+            color: var(--text-light);
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--primary);
+            transition: color 0.3s ease;
+            z-index: 2;
+        }
+
+        .toggle-password:hover {
+            color: var(--primary-dark);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .auth-btn:active {
+            transform: translateY(0);
+        }
+
+        .auth-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0));
+            transform: rotate(30deg);
+            transition: all 0.5s ease;
+        }
+
+        .auth-btn:hover::after {
+            transform: rotate(30deg) translate(10%, 10%);
+        }
+
+        .footer-text {
+            margin-top: 25px;
+            color: var(--text-light);
+            font-size: 0.9em;
+        }
+
+        .footer-text a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .footer-text a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            z-index: 2;
+        }
+
+        .leaf-decoration {
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            font-size: 80px;
+            color: var(--primary);
+            opacity: 0.3;
+            z-index: -1;
+            transform: rotate(-15deg);
+        }
+
+        .form-container {
+            overflow: hidden;
+            position: relative;
+            height: auto;
+        }
+
+        .form {
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+
+        .hidden {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            transform: translateX(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .visible {
+            transform: translateX(0);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: none;
+            border: 1px solid;
+        }
+
+        .success {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+            border-color: var(--primary);
+            display: block;
+        }
+
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            border-color: #ef9a9a;
+            display: block;
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .petals-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @media (max-width: 500px) {
+            .auth-container {
+                padding: 30px 20px;
+            }
+            
+            .game-title {
+                font-size: 2.5em;
+            }
+            
+            .auth-title {
+                font-size: 1.5em;
+            }
+            
+            .flower {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <!-- Flower decorations -->
+    <div class="flower flower-1">✿</div>
+    <div class="flower flower-2">✿</div>
+    <div class="flower flower-3">✿</div>
+    <div class="flower flower-4">✿</div>
+    
+    <!-- Falling petals -->
+    <div class="petals-container" id="petalsContainer"></div>
+
+    <div class="container">
+        <div class="auth-container">
+            <div class="leaf-decoration">❦</div>
+            <div class="game-title">GARDEN</div>
+            
+            <div class="form-container">
+                <!-- Registration Form -->
+                <form id="registrationForm" class="form visible">
+                    <div class="auth-title">REGISTRATION</div>
+                    
+                    <div id="regMessage" class="message"></div>
+                    
+                    <div class="form-group">
+                        <label for="regUsername">Username</label>
+                        <div style="position: relative;">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" id="regUsername" name="username" required 
+                                   placeholder="Enter your username" autocomplete="off">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regEmail">Email</label>
+                        <div style="position: relative;">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" id="regEmail" name="email" required 
+                                   placeholder="Enter your email" autocomplete="off">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regPassword">Password</label>
+                        <div class="password-container">
+                            <div style="position: relative;">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" id="regPassword" name="password" required 
+                                       placeholder="Create a password" autocomplete="new-password">
+                            </div>
+                            <span class="toggle-password" id="toggleRegPassword">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regConfirmPassword">Confirm Password</label>
+                        <div class="password-container">
+                            <div style="position: relative;">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" id="regConfirmPassword" name="confirmPassword" required 
+                                       placeholder="Confirm your password" autocomplete="new-password">
+                            </div>
+                            <span class="toggle-password" id="toggleRegConfirmPassword">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="auth-btn" id="regSubmitBtn">
+                        REGISTER
+                    </button>
+                    
+                    <p class="footer-text">
+                        Already have an account? <a id="showLogin">Login here</a>
+                    </p>
+                </form>
+
+                <!-- Login Form -->
+                <form id="loginForm" class="form hidden">
+                    <div class="auth-title">LOGIN</div>
+                    
+                    <div id="loginMessage" class="message"></div>
+                    
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <div style="position: relative;">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" id="loginEmail" name="email" required 
+                                   placeholder="Enter your email" autocomplete="off">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <div class="password-container">
+                            <div style="position: relative;">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" id="loginPassword" name="password" required 
+                                       placeholder="Enter your password" autocomplete="current-password">
+                            </div>
+                            <span class="toggle-password" id="toggleLoginPassword">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="auth-btn" id="loginSubmitBtn">
+                        LOGIN
+                    </button>
+                    
+                    <p class="footer-text">
+                        Don't have an account? <a id="showRegister">Register here</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const registrationForm = document.getElementById('registrationForm');
+            const loginForm = document.getElementById('loginForm');
+            const showLoginBtn = document.getElementById('showLogin');
+            const showRegisterBtn = document.getElementById('showRegister');
+            const regMessage = document.getElementById('regMessage');
+            const loginMessage = document.getElementById('loginMessage');
+            const regSubmitBtn = document.getElementById('regSubmitBtn');
+            const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+            
+            // Toggle password visibility
+            function setupPasswordToggle(passwordId, toggleId) {
+                const togglePassword = document.getElementById(toggleId);
+                const passwordInput = document.getElementById(passwordId);
+                
+                togglePassword.addEventListener('click', function() {
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        togglePassword.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                    } else {
+                        passwordInput.type = 'password';
+                        togglePassword.innerHTML = '<i class="fas fa-eye"></i>';
+                    }
+                });
+            }
+            
+            setupPasswordToggle('regPassword', 'toggleRegPassword');
+            setupPasswordToggle('regConfirmPassword', 'toggleRegConfirmPassword');
+            setupPasswordToggle('loginPassword', 'toggleLoginPassword');
+            
+            // Switch between forms
+            showLoginBtn.addEventListener('click', function() {
+                registrationForm.classList.remove('visible');
+                registrationForm.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+                loginForm.classList.add('visible');
+                loginMessage.className = 'message';
+                loginMessage.textContent = '';
+            });
+            
+            showRegisterBtn.addEventListener('click', function() {
+                loginForm.classList.remove('visible');
+                loginForm.classList.add('hidden');
+                registrationForm.classList.remove('hidden');
+                registrationForm.classList.add('visible');
+                regMessage.className = 'message';
+                regMessage.textContent = '';
+            });
+            
+            // Initialize users database in localStorage if it doesn't exist
+            function initDatabase() {
+                if (!localStorage.getItem('users')) {
+                    localStorage.setItem('users', JSON.stringify([]));
+                }
+            }
+            
+            // Get all users from database
+            function getUsers() {
+                return JSON.parse(localStorage.getItem('users')) || [];
+            }
+            
+            // Save user to database
+            function saveUser(user) {
+                const users = getUsers();
+                users.push(user);
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+            
+            // Find user by email
+            function findUserByEmail(email) {
+                const users = getUsers();
+                return users.find(user => user.email === email);
+            }
+            
+            // Find user by username
+            function findUserByUsername(username) {
+                const users = getUsers();
+                return users.find(user => user.username === username);
+            }
+            
+            // Validate email format
+            function validateEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+            
+            // Simple hash function for passwords (fallback if bcrypt fails)
+            function simpleHash(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = (hash << 5) - hash + char;
+                    hash = hash & hash;
+                }
+                return hash.toString();
+            }
+            
+            // Hash password with bcrypt or fallback
+            function hashPassword(password, callback) {
+                // Проверяем, доступен ли bcrypt
+                if (typeof bcrypt !== 'undefined' && bcrypt.genSalt) {
+                    bcrypt.genSalt(10, function(err, salt) {
+                        if (err) {
+                            console.warn('BCrypt error, using simple hash:', err);
+                            callback(null, simpleHash(password));
+                            return;
+                        }
+                        bcrypt.hash(password, salt, function(err, hash) {
+                            if (err) {
+                                console.warn('BCrypt hash error, using simple hash:', err);
+                                callback(null, simpleHash(password));
+                                return;
+                            }
+                            callback(null, hash);
+                        });
+                    });
+                } else {
+                    console.warn('BCrypt not available, using simple hash');
+                    callback(null, simpleHash(password));
+                }
+            }
+            
+            // Compare password with hash
+            function comparePassword(password, hash, callback) {
+                // Проверяем, является ли хэш bcrypt хэшем
+                if (hash.startsWith('$2a$') || hash.startsWith('$2b$') || hash.startsWith('$2y$')) {
+                    if (typeof bcrypt !== 'undefined' && bcrypt.compare) {
+                        bcrypt.compare(password, hash, function(err, result) {
+                            if (err) {
+                                console.warn('BCrypt compare error:', err);
+                                callback(null, simpleHash(password) === hash);
+                                return;
+                            }
+                            callback(null, result);
+                        });
+                    } else {
+                        callback(null, simpleHash(password) === hash);
+                    }
+                } else {
+                    // Используем простой хэш
+                    callback(null, simpleHash(password) === hash);
+                }
+            }
+            
+            // Show message
+            function showMessage(element, text, type) {
+                element.textContent = text;
+                element.className = `message ${type}`;
+                setTimeout(() => {
+                    element.className = 'message';
+                    element.textContent = '';
+                }, 5000);
+            }
+            
+            // Set loading state
+            function setLoading(button, isLoading) {
+                if (isLoading) {
+                    button.classList.add('loading');
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                } else {
+                    button.classList.remove('loading');
+                    if (button.id === 'regSubmitBtn') {
+                        button.textContent = 'REGISTER';
+                    } else {
+                        button.textContent = 'LOGIN';
+                    }
+                }
+            }
+            
+            // Registration form submission
+            registrationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('regUsername').value.trim();
+                const email = document.getElementById('regEmail').value.trim();
+                const password = document.getElementById('regPassword').value;
+                const confirmPassword = document.getElementById('regConfirmPassword').value;
+                
+                // Basic validation
+                if (username.length < 3) {
+                    showMessage(regMessage, 'Username must be at least 3 characters long', 'error');
+                    return;
+                }
+                
+                if (!validateEmail(email)) {
+                    showMessage(regMessage, 'Please enter a valid email address', 'error');
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    showMessage(regMessage, 'Password must be at least 6 characters long', 'error');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    showMessage(regMessage, 'Passwords do not match', 'error');
+                    return;
+                }
+                
+                // Check if user already exists with this email
+                if (findUserByEmail(email)) {
+                    showMessage(regMessage, 'User with this email already exists', 'error');
+                    return;
+                }
+                
+                // Check if user already exists with this username
+                if (findUserByUsername(username)) {
+                    showMessage(regMessage, 'Username is already taken', 'error');
+                    return;
+                }
+                
+                // Set loading state
+                setLoading(regSubmitBtn, true);
+                
+                // Hash password and save user
+                hashPassword(password, function(err, hashedPassword) {
+                    if (err) {
+                        showMessage(regMessage, 'Error creating account. Please try again.', 'error');
+                        setLoading(regSubmitBtn, false);
+                        return;
+                    }
+                    
+                    try {
+                        // Save user to database
+                        initDatabase();
+                        saveUser({
+                            username,
+                            email,
+                            password: hashedPassword,
+                            level: 1,
+                            coins: 100,
+                            experience: 0,
+                            profile: {},
+                            friends: [],
+                            plants: [],
+                            achievements: [],
+                            gameStats: {},
+                            registeredAt: new Date().toISOString()
+                        });
+                        
+                        // Success message
+                        showMessage(regMessage, `Registration successful! Welcome to our garden, ${username}!`, 'success');
+                        
+                        // Store logged in user in session
+                        sessionStorage.setItem('currentUser', JSON.stringify({
+                            username,
+                            email,
+                            level: 1
+                        }));
+                        
+                        // Clear form
+                        registrationForm.reset();
+                        
+                        // Redirect to main site after successful registration
+                        setTimeout(() => {
+                            window.location.href = 'main-site.html';
+                        }, 1500);
+                        
+                    } catch (error) {
+                        console.error('Registration error:', error);
+                        showMessage(regMessage, 'Error during registration. Please try again.', 'error');
+                    } finally {
+                        setLoading(regSubmitBtn, false);
+                    }
+                });
+            });
+            
+            // Login form submission
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('loginEmail').value.trim();
+                const password = document.getElementById('loginPassword').value;
+                
+                // Validation
+                if (!validateEmail(email)) {
+                    showMessage(loginMessage, 'Please enter a valid email address', 'error');
+                    return;
+                }
+                
+                if (password.length < 1) {
+                    showMessage(loginMessage, 'Please enter your password', 'error');
+                    return;
+                }
+                
+                // Set loading state
+                setLoading(loginSubmitBtn, true);
+                
+                // Find user
+                const user = findUserByEmail(email);
+                
+                if (!user) {
+                    showMessage(loginMessage, 'No account found with this email', 'error');
+                    setLoading(loginSubmitBtn, false);
+                    return;
+                }
+                
+                // Check password
+                comparePassword(password, user.password, function(err, result) {
+                    if (err) {
+                        console.error('Password comparison error:', err);
+                        showMessage(loginMessage, 'Error during login. Please try again.', 'error');
+                        setLoading(loginSubmitBtn, false);
+                        return;
+                    }
+                    
+                    if (!result) {
+                        showMessage(loginMessage, 'Incorrect password', 'error');
+                        setLoading(loginSubmitBtn, false);
+                        return;
+                    }
+                    
+                    // Success message
+                    showMessage(loginMessage, `Login successful! Welcome back, ${user.username}!`, 'success');
+                    
+                    // Store logged in user in session
+                    sessionStorage.setItem('currentUser', JSON.stringify({
+                        username: user.username,
+                        email: user.email,
+                        level: user.level || 1
+                    }));
+                    
+                    // Clear form
+                    loginForm.reset();
+                    
+                    // Redirect to main site after successful login
+                    setTimeout(() => {
+                        window.location.href = 'main-site.html';
+                    }, 1500);
+                    
+                    setLoading(loginSubmitBtn, false);
+                });
+            });
+            
+            // Create falling petals
+            function createPetals() {
+                const container = document.getElementById('petalsContainer');
+                const petalCount = 15;
+                
+                for (let i = 0; i < petalCount; i++) {
+                    const petal = document.createElement('div');
+                    petal.classList.add('petal');
+                    
+                    // Random properties
+                    const size = Math.random() * 15 + 5;
+                    const left = Math.random() * 100;
+                    const delay = Math.random() * 15;
+                    const duration = Math.random() * 10 + 15;
+                    
+                    petal.style.width = `${size}px`;
+                    petal.style.height = `${size}px`;
+                    petal.style.left = `${left}vw`;
+                    petal.style.animationDelay = `${delay}s`;
+                    petal.style.animationDuration = `${duration}s`;
+                    
+                    // Random color based on theme
+                    const colors = [
+                        'var(--primary)',
+                        'var(--primary-dark)',
+                        'var(--primary-light)'
+                    ];
+                    petal.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    container.appendChild(petal);
+                }
+            }
+            
+            createPetals();
+
+            // Test bcrypt availability
+            console.log('BCrypt available:', typeof bcrypt !== 'undefined');
+            if (typeof bcrypt !== 'undefined') {
+                console.log('BCrypt version:', bcrypt.version || 'Unknown');
+            }
+        });
+
+        // Общий код для применения темы на всех страницах
+        function applyThemeSettings() {
+            const settings = JSON.parse(localStorage.getItem('appSettings')) || {};
+            
+            if (settings.theme) {
+                document.body.setAttribute('data-theme', settings.theme);
+                
+                // Применяем dark mode для не-темных тем
+                if (settings.darkMode && settings.theme !== 'dark') {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            }
+            
+            // Применяем настройки шрифта если есть
+            if (settings.fontSize) {
+                document.body.style.fontSize = settings.fontSize + 'px';
+            }
+            if (settings.fontFamily) {
+                document.body.style.fontFamily = settings.fontFamily + ', sans-serif';
+            }
+        }
+
+        // Применяем настройки при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            applyThemeSettings();
+            
+            // Проверяем авторизацию (если нужно)
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (currentUser && window.location.pathname.includes('registration.html')) {
+                window.location.href = 'main-site.html';
+            }
+        });
+    </script>
+</body>
+</html>

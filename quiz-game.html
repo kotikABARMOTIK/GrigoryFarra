@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Садовый квиз - Garden Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="js/settings-manager.js"></script>
+    <script src="theme-manager.js"></script>
+    <script src="lang.js"></script>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #2E7D32;
+            --primary-light: #E8F5E9;
+            --accent: #FF4081;
+            --text: #333333;
+            --text-light: #666666;
+            --background: #F9F9F9;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --radius: 16px;
+            --border: #E0E0E0;
+        }
+
+        [data-theme="dark"] {
+            --primary: #66bb6a;
+            --primary-dark: #388e3c;
+            --primary-light: #1b5e20;
+            --text: #ffffff;
+            --text-light: #b0b0b0;
+            --background: #121212;
+            --card-bg: #1e1e1e;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --border: #333333;
+        }
+
+        [data-theme="green"] {
+            --primary: #4CAF50;
+            --primary-dark: #2E7D32;
+            --primary-light: #E8F5E9;
+            --text: #1B5E20;
+            --text-light: #4CAF50;
+            --background: #F1F8E9;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(76, 175, 80, 0.15);
+            --border: #C8E6C9;
+        }
+
+        [data-theme="blue"] {
+            --primary: #2196F3;
+            --primary-dark: #1976D2;
+            --primary-light: #E3F2FD;
+            --text: #0D47A1;
+            --text-light: #2196F3;
+            --background: #E3F2FD;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(33, 150, 243, 0.15);
+            --border: #BBDEFB;
+        }
+
+        [data-theme="green"].dark-mode {
+            --primary: #66bb6a;
+            --primary-dark: #388e3c;
+            --primary-light: #1b5e20;
+            --text: #e8f5e9;
+            --text-light: #a5d6a7;
+            --background: #1b311c;
+            --card-bg: #2e4630;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --border: #1b5e20;
+        }
+
+        [data-theme="blue"].dark-mode {
+            --primary: #64b5f6;
+            --primary-dark: #1976d2;
+            --primary-light: #0d47a1;
+            --text: #e3f2fd;
+            --text-light: #90caf9;
+            --background: #0d1b33;
+            --card-bg: #1e2b47;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --border: #1565c0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+
+        .flower {
+            position: fixed;
+            z-index: 0;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .flower-1 {
+            top: 10%;
+            left: 10%;
+            font-size: 40px;
+            color: var(--primary);
+            transform: rotate(-15deg);
+        }
+
+        .flower-2 {
+            bottom: 15%;
+            right: 10%;
+            font-size: 35px;
+            color: var(--primary-dark);
+            transform: rotate(25deg);
+        }
+
+        .flower-3 {
+            top: 20%;
+            right: 15%;
+            font-size: 30px;
+            color: var(--accent);
+            transform: rotate(10deg);
+        }
+
+        .flower-4 {
+            bottom: 20%;
+            left: 15%;
+            font-size: 45px;
+            color: var(--primary-light);
+            transform: rotate(-20deg);
+        }
+
+        .petal {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            border-radius: 50% 50% 50% 0;
+            opacity: 0.6;
+            animation: fall 15s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 0.7; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        header {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--primary-dark);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-icon {
+            font-size: 2em;
+            color: var(--primary);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border: 1px solid var(--border);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            position: relative;
+            z-index: 2;
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+
+        .quiz-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--primary-light);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: var(--text-light);
+        }
+
+        .question-container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .question-number {
+            color: var(--text-light);
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            color: var(--text);
+        }
+
+        .question-image {
+            font-size: 4em;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--primary);
+        }
+
+        .answers-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .answer-btn {
+            background: var(--primary-light);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 15px 20px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            color: var(--text);
+        }
+
+        .answer-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .answer-btn.correct {
+            background: #c8e6c9;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+
+        .answer-btn.incorrect {
+            background: #ffcdd2;
+            border-color: #f44336;
+            color: #c62828;
+        }
+
+        .answer-btn:disabled {
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quiz-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: var(--border);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        .result-container {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .result-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .result-title {
+            font-size: 2em;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .result-score {
+            font-size: 3em;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 20px 0;
+        }
+
+        .timer {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ff9800;
+            margin: 10px 0;
+        }
+
+        .streak-counter {
+            background: #ff9800;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .category-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .category-btn {
+            background: var(--primary-light);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text);
+        }
+
+        .category-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .category-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .difficulty-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            background: var(--card-bg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .difficulty-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .difficulty-btn.impossible {
+            background: linear-gradient(45deg, #ff0000, #8b0000);
+            color: white;
+            border-color: #8b0000;
+            font-weight: bold;
+        }
+
+        .difficulty-btn.impossible.active {
+            background: linear-gradient(45deg, #8b0000, #ff0000);
+            border-color: #ff0000;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+        }
+
+        .hint-btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            cursor: pointer;
+            margin: 10px 0;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .hint-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        }
+
+        .hint-text {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #2196f3;
+            color: #0D47A1;
+        }
+
+        .achievement-badge {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin: 5px;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .legendary-badge {
+            background: linear-gradient(45deg, #8B0000, #FF0000, #FF8C00);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin: 5px;
+            display: inline-block;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .chemical-formula {
+            font-family: 'Courier New', monospace;
+            background: var(--primary-light);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .scientific-term {
+            font-style: italic;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .petals-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .quiz-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .category-selector {
+                grid-template-columns: 1fr;
+            }
+            
+            .difficulty-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .quiz-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .logo-text {
+                font-size: 1.8em;
+            }
+            
+            .quiz-title {
+                font-size: 2em;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .quiz-container {
+                padding: 20px;
+            }
+            
+            .question-container {
+                padding: 20px;
+            }
+            
+            .question-text {
+                font-size: 1.1em;
+            }
+            
+            .result-score {
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="flower flower-1">✿</div>
+    <div class="flower flower-2">✿</div>
+    <div class="flower flower-3">✿</div>
+    <div class="flower flower-4">✿</div>
+    
+    <div class="petals-container" id="petalsContainer"></div>
+
+    <header>
+        <div class="logo" onclick="window.location.href='main-site.html'">
+            <div class="logo-icon">🌿</div>
+            <div class="logo-text">Garden Game</div>
+        </div>
+        <div>
+            <button class="btn btn-secondary" onclick="window.location.href='games.html'">
+                <i class="fas fa-arrow-left"></i> Назад к играм
+            </button>
+        </div>
+    </header>
+
+    <div class="quiz-container">
+        <div id="startScreen">
+            <div class="quiz-header">
+                <h1 class="quiz-title">Садовый квиз</h1>
+                <p style="color: var(--text-light);">Проверьте свои знания о растениях и садоводстве!</p>
+            </div>
+
+            <div class="difficulty-selector">
+                <button class="difficulty-btn active" onclick="setDifficulty('easy')">Легкий</button>
+                <button class="difficulty-btn" onclick="setDifficulty('medium')">Средний</button>
+                <button class="difficulty-btn" onclick="setDifficulty('hard')">Сложный</button>
+                <button class="difficulty-btn" onclick="setDifficulty('expert')">Эксперт</button>
+                <button class="difficulty-btn impossible" onclick="setDifficulty('impossible')">Невозможный</button>
+            </div>
+
+            <div class="category-selector">
+                <div class="category-btn" onclick="startQuiz('plants')">
+                    <div class="category-icon">🌱</div>
+                    <div>Растения</div>
+                    <small style="color: var(--text-light);">Основы ботаники</small>
+                </div>
+                <div class="category-btn" onclick="startQuiz('care')">
+                    <div class="category-icon">💧</div>
+                    <div>Уход</div>
+                    <small style="color: var(--text-light);">Полив и удобрения</small>
+                </div>
+                <div class="category-btn" onclick="startQuiz('seasons')">
+                    <div class="category-icon">🍂</div>
+                    <div>Сезоны</div>
+                    <small style="color: var(--text-light);">Сезонные работы</small>
+                </div>
+                <div class="category-btn" onclick="startQuiz('mixed')">
+                    <div class="category-icon">🎯</div>
+                    <div>Микс</div>
+                    <small style="color: var(--text-light);">Все категории</small>
+                </div>
+            </div>
+
+            <div class="quiz-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalQuizzes">0</div>
+                    <div class="stat-label">Пройдено квизов</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="bestScore">0%</div>
+                    <div class="stat-label">Лучший результат</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="correctAnswers">0</div>
+                    <div class="stat-label">Правильных ответов</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="currentStreak">0</div>
+                    <div class="stat-label">Текущая серия</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="quizScreen" style="display: none;">
+            <div class="quiz-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="currentQuestion">1/10</div>
+                    <div class="stat-label">Вопрос</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="score">0</div>
+                    <div class="stat-label">Счет</div>
+                </div>
+                <div class="stat-card">
+                    <div class="timer" id="timer">30</div>
+                    <div class="stat-label">Время</div>
+                </div>
+                <div class="stat-card">
+                    <div class="streak-counter" id="streak">×1</div>
+                    <div class="stat-label">Множитель</div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress" id="quizProgress" style="width: 10%"></div>
+            </div>
+
+            <div class="question-container">
+                <div class="question-number">Вопрос <span id="questionNum">1</span> из <span id="totalQuestions">10</span></div>
+                <div class="question-image" id="questionImage">🌿</div>
+                <div class="question-text" id="questionText"></div>
+                
+                <button class="hint-btn" id="hintBtn" onclick="showHint()" style="display: none;">
+                    <i class="fas fa-lightbulb"></i> Подсказка (-10 очков)
+                </button>
+                <div class="hint-text" id="hintText" style="display: none;"></div>
+                
+                <div class="answers-grid" id="answersContainer">
+                    <!-- Ответы будут добавлены через JS -->
+                </div>
+            </div>
+
+            <div class="quiz-controls">
+                <button class="btn btn-secondary" onclick="endQuiz()">Завершить</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>Следующий вопрос</button>
+            </div>
+        </div>
+
+        <div id="resultScreen" style="display: none;">
+            <div class="result-container">
+                <div class="result-icon" id="resultIcon">🎉</div>
+                <h2 class="result-title" id="resultTitle">Поздравляем!</h2>
+                <div class="result-score" id="finalScore">85%</div>
+                <p id="resultMessage" style="color: var(--text-light); margin-bottom: 20px;">Отличный результат! Вы настоящий эксперт по растениям!</p>
+                
+                <div id="achievementsEarned" style="margin: 15px 0;"></div>
+                
+                <div class="quiz-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="resultCorrect">8</div>
+                        <div class="stat-label">Правильно</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="resultTime">02:30</div>
+                        <div class="stat-label">Время</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="resultStreak">×3</div>
+                        <div class="stat-label">Макс. множитель</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="resultXP">+250</div>
+                        <div class="stat-label">Опыт</div>
+                    </div>
+                </div>
+
+                <div class="quiz-controls">
+                    <button class="btn btn-secondary" onclick="showStartScreen()">Главное меню</button>
+                    <button class="btn btn-primary" onclick="restartQuiz()">Играть снова</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Полная система вопросов по сложности как в оригинале
+        const quizData = {
+            plants: [
+                {
+                    question: "Какой процесс позволяет растениям получать энергию от солнца?",
+                    image: "🌞",
+                    answers: [
+                        "Фотосинтез",
+                        "Дыхание",
+                        "Транспирация",
+                        "Опыление"
+                    ],
+                    correct: 0,
+                    hint: "Этот процесс происходит в хлоропластах"
+                },
+                {
+                    question: "Какая часть растения отвечает за поглощение воды и минералов?",
+                    image: "🌱",
+                    answers: [
+                        "Корни",
+                        "Листья",
+                        "Стебель",
+                        "Цветы"
+                    ],
+                    correct: 0,
+                    hint: "Они находятся под землей"
+                },
+                {
+                    question: "Что такое хлорофилл?",
+                    image: "🍃",
+                    answers: [
+                        "Зеленый пигмент растений",
+                        "Вид удобрения",
+                        "Тип почвы",
+                        "Вода для полива"
+                    ],
+                    correct: 0,
+                    hint: "Он придает растениям зеленый цвет"
+                },
+                {
+                    question: "Какое растение является символом Японии?",
+                    image: "🌸",
+                    answers: [
+                        "Сакура",
+                        "Роза",
+                        "Тюльпан",
+                        "Орхидея"
+                    ],
+                    correct: 0,
+                    hint: "Это дерево с розовыми цветами"
+                },
+                {
+                    question: "Как называется мужская часть цветка?",
+                    image: "🌺",
+                    answers: [
+                        "Тычинка",
+                        "Пестик",
+                        "Лепесток",
+                        "Чашелистик"
+                    ],
+                    correct: 0,
+                    hint: "Содержит пыльцу"
+                }
+            ],
+            care: [
+                {
+                    question: "Как часто нужно поливать кактусы?",
+                    image: "🌵",
+                    answers: [
+                        "Редко, когда почва полностью сухая",
+                        "Каждый день",
+                        "Два раза в день",
+                        "Раз в неделю независимо от состояния почвы"
+                    ],
+                    correct: 0,
+                    hint: "Кактусы запасают воду в своих тканях"
+                },
+                {
+                    question: "Какое удобрение лучше для цветущих растений?",
+                    image: "🌷",
+                    answers: [
+                        "С высоким содержанием фосфора",
+                        "С высоким содержанием азота",
+                        "С высоким содержанием калия",
+                        "Универсальное"
+                    ],
+                    correct: 0,
+                    hint: "Фосфор способствует цветению"
+                },
+                {
+                    question: "Что такое дренаж в горшке?",
+                    image: "🏺",
+                    answers: [
+                        "Слой для отвода лишней воды",
+                        "Вид почвы",
+                        "Удобрение",
+                        "Инструмент для полива"
+                    ],
+                    correct: 0,
+                    hint: "Предотвращает загнивание корней"
+                },
+                {
+                    question: "Когда лучше всего пересаживать комнатные растения?",
+                    image: "🪴",
+                    answers: [
+                        "Весной",
+                        "Зимой",
+                        "Летом",
+                        "Осенью"
+                    ],
+                    correct: 0,
+                    hint: "В период активного роста"
+                },
+                {
+                    question: "Что означает пожелтение листьев у растений?",
+                    image: "🍂",
+                    answers: [
+                        "Недостаток питательных веществ или избыток воды",
+                        "Слишком много солнца",
+                        "Нормальный процесс",
+                        "Избыток удобрений"
+                    ],
+                    correct: 0,
+                    hint: "Часто связано с поливом"
+                }
+            ],
+            seasons: [
+                {
+                    question: "В какое время года лучше всего сажать тюльпаны?",
+                    image: "🌷",
+                    answers: [
+                        "Осенью",
+                        "Весной",
+                        "Летом",
+                        "Зимой"
+                    ],
+                    correct: 0,
+                    hint: "Они должны перезимовать в земле"
+                },
+                {
+                    question: "Когда обрезают розы?",
+                    image: "🌹",
+                    answers: [
+                        "Ранней весной",
+                        "Летом",
+                        "Осенью",
+                        "Зимой"
+                    ],
+                    correct: 0,
+                    hint: "До начала активного роста"
+                },
+                {
+                    question: "Какие растения сажают под зиму?",
+                    image: "❄️",
+                    answers: [
+                        "Чеснок и лук",
+                        "Помидоры",
+                        "Огурцы",
+                        "Перцы"
+                    ],
+                    correct: 0,
+                    hint: "Озимые культуры"
+                },
+                {
+                    question: "Когда собирают урожай яблок?",
+                    image: "🍎",
+                    answers: [
+                        "В конце лета - начале осени",
+                        "Весной",
+                        "Зимой",
+                        "В начале лета"
+                    ],
+                    correct: 0,
+                    hint: "Зависит от сорта"
+                },
+                {
+                    question: "Как подготовить сад к зиме?",
+                    image: "🌲",
+                    answers: [
+                        "Укрыть растения и убрать листву",
+                        "Удобрить азотом",
+                        "Обильно полить",
+                        "Обрезать все ветки"
+                    ],
+                    correct: 0,
+                    hint: "Защита от морозов"
+                }
+            ]
+        };
+
+        // Дополнительные сложные вопросы для режима эксперта
+        const expertQuestions = [
+            {
+                question: "Что такое микориза?",
+                image: "🍄",
+                answers: [
+                    "Симбиоз грибов и корней растений",
+                    "Болезнь растений",
+                    "Вид удобрения",
+                    "Тип почвы"
+                ],
+                correct: 0,
+                hint: "Это взаимовыгодное сотрудничество"
+            },
+            {
+                question: "Какое растение является хищником?",
+                image: "🪴",
+                answers: [
+                    "Венерина мухоловка",
+                    "Кактус",
+                    "Орхидея",
+                    "Папоротник"
+                ],
+                correct: 0,
+                hint: "Ловит насекомых"
+            },
+            {
+                question: "Что такое фитогормоны?",
+                image: "🔬",
+                answers: [
+                    "Регуляторы роста растений",
+                    "Виды удобрений",
+                    "Болезни растений",
+                    "Пестициды"
+                ],
+                correct: 0,
+                hint: "Ауксины, гиббереллины и др."
+            },
+            {
+                question: "Как называется наука о растениях?",
+                image: "📚",
+                answers: [
+                    "Ботаника",
+                    "Биология",
+                    "Агрономия",
+                    "Экология"
+                ],
+                correct: 0,
+                hint: "Раздел биологии"
+            },
+            {
+                question: "Что такое гидропоника?",
+                image: "💧",
+                answers: [
+                    "Выращивание растений без почвы",
+                    "Вид полива",
+                    "Система удобрений",
+                    "Метод обрезки"
+                ],
+                correct: 0,
+                hint: "На водных растворах"
+            }
+        ];
+
+        // ВОПРОСЫ УРОВНЯ МГУ ДЛЯ НЕВОЗМОЖНОЙ СЛОЖНОСТИ
+        const msuLevelQuestions = [
+            {
+                question: "Какой фермент катализирует первую реакцию цикла Кальвина?",
+                image: "🔬",
+                answers: [
+                    "Рибулозо-1,5-бисфосфаткарбоксилаза/оксигеназа (Rubisco)",
+                    "Фосфоенолпируваткарбоксикиназа",
+                    "Пируваткиназа",
+                    "Гексокиназа"
+                ],
+                correct: 0,
+                hint: "Это самый распространенный фермент на Земле"
+            },
+            {
+                question: "Какое явление описывает уравнение Михаэлиса-Ментен в фотосинтезе?",
+                image: "📈",
+                answers: [
+                    "Кинетику ферментативных реакций",
+                    "Диффузию CO₂ в устьица",
+                    "Транспирацию воды",
+                    "Поглощение фотонов"
+                ],
+                correct: 0,
+                hint: "Связывает скорость реакции с концентрацией субстрата"
+            },
+            {
+                question: "Какой тип фотосинтеза (C3, C4, CAM) наиболее эффективен при высоких температурах?",
+                image: "🌡️",
+                answers: [
+                    "C4",
+                    "C3", 
+                    "CAM",
+                    "Все одинаково эффективны"
+                ],
+                correct: 0,
+                hint: "Характерен для тропических злаков"
+            },
+            {
+                question: "Что такое аллелопатия в фитоценозах?",
+                image: "🌿",
+                answers: [
+                    "Влияние растений друг на друга через выделение химических веществ",
+                    "Конкуренция за свет",
+                    "Симбиоз с грибами",
+                    "Перекрестное опыление"
+                ],
+                correct: 0,
+                hint: "Пример: грецкий орех подавляет рост других растений"
+            },
+            {
+                question: "Какой гормон ингибирует прорастание почек?",
+                image: "💤",
+                answers: [
+                    "Абсцизовая кислота (ABA)",
+                    "Ауксин",
+                    "Гиббереллин",
+                    "Цитокинин"
+                ],
+                correct: 0,
+                hint: "Также участвует в ответе на стресс"
+            },
+            {
+                question: "Что описывает закон минимума Либиха?",
+                image: "⚖️",
+                answers: [
+                    "Рост ограничен самым дефицитным ресурсом",
+                    "Фотосинтетическую эффективность",
+                    "Распределение биомассы",
+                    "Скорость транспирации"
+                ],
+                correct: 0,
+                hint: 'Известен как "бочонок Либиха"'
+            },
+            {
+                question: "Какой процесс обеспечивает движение воды по ксилеме согласно теории сцепления-натяжения?",
+                image: "💧",
+                answers: [
+                    "Транспирация",
+                    "Осмос",
+                    "Капиллярность", 
+                    "Активный транспорт"
+                ],
+                correct: 0,
+                hint: "Связан с испарением воды через устьица"
+            },
+            {
+                question: "Что такое хроматография в фитохимии?",
+                image: "🎨",
+                answers: [
+                    "Метод разделения и анализа пигментов",
+                    "Синтез хлорофилла",
+                    "Изменение окраски листьев",
+                    "Фотосинтетическая единица"
+                ],
+                correct: 0,
+                hint: "Используется для разделения растительных пигментов"
+            },
+            {
+                question: "Какой ион является кофактором в молекуле хлорофилла?",
+                image: "⚛️",
+                answers: [
+                    "Mg²⁺",
+                    "Fe²⁺",
+                    "Ca²⁺",
+                    "K⁺"
+                ],
+                correct: 0,
+                hint: "Центральный атом в порфириновом кольце"
+            },
+            {
+                question: "Что такое фотореспирация?",
+                image: "🔄",
+                answers: [
+                    "Окисление рибулозо-1,5-бисфосфата кислородом",
+                    "Дыхание на свету",
+                    "Выделение кислорода",
+                    "Поглощение CO₂ ночью"
+                ],
+                correct: 0,
+                hint: "Конкурирует с карбоксилированием за субстрат"
+            },
+            {
+                question: "Какой белок отвечает за открытие устьичных щелей?",
+                image: "🚪",
+                answers: [
+                    "АТФ-зависимая протонная помпа",
+                    "Аквапорин",
+                    "Рубиско",
+                    "Фотосистема II"
+                ],
+                correct: 0,
+                hint: "Создает электрохимический градиент для influx ионов калия"
+            },
+            {
+                question: "Что такое апопласт и симпласт в растительных тканях?",
+                image: "🔄",
+                answers: [
+                    "Пути транспорта веществ через клеточные стенки и цитоплазму",
+                    "Типы фотосинтеза",
+                    "Виды меристем",
+                    "Формы хлоропластов"
+                ],
+                correct: 0,
+                hint: "Апопласт - внеклеточное пространство, симпласт - цитоплазматическое"
+            },
+            {
+                question: "Какой процесс описывает уравнение Фick'a для диффузии газов?",
+                image: "📊",
+                answers: [
+                    "Диффузию CO₂ через устьица",
+                    "Транспирационный поток",
+                    "Фотосинтетическую продуктивность",
+                    "Рост корневой системы"
+                ],
+                correct: 0,
+                hint: "J = -D * (dc/dx), где J - поток, D - коэффициент диффузии"
+            },
+            {
+                question: "Что такое хемиосмотическая теория Митчелла в контексте фотосинтеза?",
+                image: "⚡",
+                answers: [
+                    "Синтез АТФ за счет протонного градиента",
+                    "Поглощение света пигментами",
+                    "Транспорт электронов",
+                    "Фиксация углерода"
+                ],
+                correct: 0,
+                hint: "Объясняет работу АТФ-синтазы в тилакоидных мембранах"
+            },
+            {
+                question: "Какой тип тканей обеспечивает вторичный рост растений?",
+                image: "📏",
+                answers: [
+                    "Камбий",
+                    "Эпидермис",
+                    "Механические ткани",
+                    "Проводящие пучки"
+                ],
+                correct: 0,
+                hint: "Латеральная меристема, обеспечивающая утолщение стебля"
+            },
+            {
+                question: "Что такое аллантоиновая кислота в метаболизме растений?",
+                image: "🧪",
+                answers: [
+                    "Промежуточный продукт распада пуринов",
+                    "Фотосинтетический пигмент",
+                    "Растительный гормон",
+                    "Запасное вещество"
+                ],
+                correct: 0,
+                hint: "Участвует в азотном обмене"
+            },
+            {
+                question: "Какой процесс описывает явление Вертициллезного увядания?",
+                image: "🥀",
+                answers: [
+                    "Грибковое заболевание, блокирующее ксилему",
+                    "Дефицит воды",
+                    "Солнечный ожог",
+                    "Минеральное голодание"
+                ],
+                correct: 0,
+                hint: "Вызывается почвенными грибами рода Verticillium"
+            },
+            {
+                question: "Что такое фототропин и криптохром?",
+                image: "🔍",
+                answers: [
+                    "Фоторецепторы синего света",
+                    "Фотосинтетические пигменты",
+                    "Ферменты цикла Кальвина",
+                    "Транспортные белки"
+                ],
+                correct: 0,
+                hint: "Регулируют фотоморфогенез и фотопериодизм"
+            },
+            {
+                question: "Какой механизм обеспечивает избирательное поглощение ионов корневыми волосками?",
+                image: "🌱",
+                answers: [
+                    "Активный транспорт через ионные каналы",
+                    "Осмос",
+                    "Диффузия",
+                    "Пиноцитоз"
+                ],
+                correct: 0,
+                hint: "Требует затрат АТФ и специфичных переносчиков"
+            },
+            {
+                question: "Что такое C:N ratio и как он влияет на разложение органики?",
+                image: "📊",
+                answers: [
+                    "Соотношение углерода к азоту, определяющее скорость разложения",
+                    "Баланс фотосинтеза и дыхания",
+                    "Эффективность использования воды",
+                    "Содержание хлорофилла"
+                ],
+                correct: 0,
+                hint: "Высокое соотношение замедляет разложение"
+            }
+        ];
+
+        let currentQuiz = {
+            category: '',
+            difficulty: 'easy',
+            questions: [],
+            currentQuestionIndex: 0,
+            score: 0,
+            correctAnswers: 0,
+            timeLeft: 30,
+            timer: null,
+            streak: 0,
+            maxStreak: 0,
+            startTime: null,
+            hintsUsed: 0,
+            achievements: []
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (!currentUser) {
+                window.location.href = 'registration.html';
+                return;
+            }
+
+            applyThemeSettings();
+            loadUserStats();
+            createPetals();
+        });
+
+        function createPetals() {
+            const container = document.getElementById('petalsContainer');
+            const petalCount = 15;
+            
+            for (let i = 0; i < petalCount; i++) {
+                const petal = document.createElement('div');
+                petal.classList.add('petal');
+                
+                const size = Math.random() * 15 + 5;
+                const left = Math.random() * 100;
+                const delay = Math.random() * 15;
+                const duration = Math.random() * 10 + 15;
+                
+                petal.style.width = `${size}px`;
+                petal.style.height = `${size}px`;
+                petal.style.left = `${left}vw`;
+                petal.style.animationDelay = `${delay}s`;
+                petal.style.animationDuration = `${duration}s`;
+                
+                const colors = [
+                    'var(--primary)',
+                    'var(--primary-dark)',
+                    'var(--accent)',
+                    'var(--primary-light)'
+                ];
+                petal.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                container.appendChild(petal);
+            }
+        }
+
+        function setDifficulty(difficulty) {
+            currentQuiz.difficulty = difficulty;
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function startQuiz(category) {
+            currentQuiz.category = category;
+            currentQuiz.questions = generateQuizQuestions(category, currentQuiz.difficulty);
+            currentQuiz.currentQuestionIndex = 0;
+            currentQuiz.score = 0;
+            currentQuiz.correctAnswers = 0;
+            currentQuiz.streak = 0;
+            currentQuiz.maxStreak = 0;
+            currentQuiz.startTime = Date.now();
+            currentQuiz.hintsUsed = 0;
+            currentQuiz.achievements = [];
+
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('quizScreen').style.display = 'block';
+            
+            // Предупреждение для невозможной сложности
+            if (currentQuiz.difficulty === 'impossible') {
+                setTimeout(() => {
+                    alert('🚨 ВНИМАНИЕ: Уровень "Невозможный" содержит вопросы уровня МГУ!\nТолько для настоящих экспертов ботаники!');
+                }, 100);
+            }
+            
+            loadQuestion();
+            startTimer();
+        }
+
+        function generateQuizQuestions(category, difficulty) {
+            let questions = [];
+            let baseQuestions = [];
+            
+            // Базовые вопросы в зависимости от категории
+            if (category === 'mixed') {
+                // Для микса берем вопросы из всех категорий
+                baseQuestions = [
+                    ...quizData.plants,
+                    ...quizData.care, 
+                    ...quizData.seasons
+                ];
+            } else {
+                baseQuestions = quizData[category] || [];
+            }
+            
+            // Добавляем вопросы в зависимости от сложности
+            if (difficulty === 'expert') {
+                baseQuestions = baseQuestions.concat(expertQuestions);
+            } else if (difficulty === 'impossible') {
+                baseQuestions = msuLevelQuestions; // Только вопросы уровня МГУ
+            }
+            
+            // Определяем количество вопросов в зависимости от сложности
+            const questionCount = {
+                'easy': 5,
+                'medium': 8,
+                'hard': 12,
+                'expert': 15,
+                'impossible': 20
+            }[difficulty] || 10;
+            
+            // Перемешиваем вопросы и выбираем нужное количество
+            const shuffled = [...baseQuestions].sort(() => Math.random() - 0.5);
+            questions = shuffled.slice(0, Math.min(questionCount, shuffled.length));
+            
+            return questions;
+        }
+
+        function loadQuestion() {
+            const question = currentQuiz.questions[currentQuiz.currentQuestionIndex];
+            if (!question) return;
+
+            document.getElementById('questionNum').textContent = currentQuiz.currentQuestionIndex + 1;
+            document.getElementById('totalQuestions').textContent = currentQuiz.questions.length;
+            
+            // Форматируем текст вопроса для научных терминов
+            let questionText = question.question;
+            questionText = questionText.replace(/(C3|C4|CAM|CO₂|ATP|ABA|Rubisco)/g, '<span class="scientific-term">$1</span>');
+            questionText = questionText.replace(/(Mg²⁺|Fe²⁺|Ca²⁺|K⁺)/g, '<span class="chemical-formula">$1</span>');
+            
+            document.getElementById('questionText').innerHTML = questionText;
+            document.getElementById('questionImage').textContent = question.image;
+            document.getElementById('currentQuestion').textContent = 
+                `${currentQuiz.currentQuestionIndex + 1}/${currentQuiz.questions.length}`;
+            
+            // Обновляем прогресс
+            const progress = ((currentQuiz.currentQuestionIndex + 1) / currentQuiz.questions.length) * 100;
+            document.getElementById('quizProgress').style.width = progress + '%';
+
+            // Сбрасываем подсказку
+            document.getElementById('hintText').style.display = 'none';
+            document.getElementById('hintBtn').style.display = currentQuiz.difficulty !== 'easy' ? 'block' : 'none';
+
+            // Создаем кнопки ответов
+            const answersContainer = document.getElementById('answersContainer');
+            answersContainer.innerHTML = '';
+
+            question.answers.forEach((answer, index) => {
+                const button = document.createElement('button');
+                button.className = 'answer-btn';
+                
+                // Форматируем ответы с научными терминами
+                let answerText = answer;
+                answerText = answerText.replace(/(C3|C4|CAM|CO₂|ATP|ABA|Rubisco)/g, '<span class="scientific-term">$1</span>');
+                answerText = answerText.replace(/(Mg²⁺|Fe²⁺|Ca²⁺|K⁺)/g, '<span class="chemical-formula">$1</span>');
+                
+                button.innerHTML = answerText;
+                button.onclick = () => selectAnswer(index);
+                answersContainer.appendChild(button);
+            });
+
+            // Сбрасываем состояние кнопки "Далее"
+            document.getElementById('nextBtn').disabled = true;
+            resetTimer();
+        }
+
+        function showHint() {
+            const question = currentQuiz.questions[currentQuiz.currentQuestionIndex];
+            if (!question.hint) return;
+
+            document.getElementById('hintText').textContent = question.hint;
+            document.getElementById('hintText').style.display = 'block';
+            document.getElementById('hintBtn').style.display = 'none';
+            
+            // Штраф за использование подсказки (больше для невозможной сложности)
+            const hintPenalty = currentQuiz.difficulty === 'impossible' ? 20 : 10;
+            currentQuiz.score = Math.max(0, currentQuiz.score - hintPenalty);
+            currentQuiz.hintsUsed++;
+            updateStats();
+        }
+
+        function selectAnswer(selectedIndex) {
+            const question = currentQuiz.questions[currentQuiz.currentQuestionIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            
+            // Отключаем все кнопки
+            buttons.forEach(btn => btn.disabled = true);
+            
+            // Подсвечиваем правильный и неправильный ответы
+            buttons[question.correct].classList.add('correct');
+            if (selectedIndex !== question.correct) {
+                buttons[selectedIndex].classList.add('incorrect');
+                currentQuiz.streak = 0;
+            } else {
+                currentQuiz.correctAnswers++;
+                currentQuiz.streak++;
+                currentQuiz.maxStreak = Math.max(currentQuiz.maxStreak, currentQuiz.streak);
+                
+                // Начисляем очки с учетом множителя и сложности
+                const basePoints = {
+                    'easy': 10,
+                    'medium': 15,
+                    'hard': 20,
+                    'expert': 25,
+                    'impossible': 30
+                }[currentQuiz.difficulty] || 10;
+                
+                const streakMultiplier = Math.min(5, Math.floor(currentQuiz.streak / 3) + 1);
+                const timeBonus = Math.max(1, Math.floor(currentQuiz.timeLeft / 5));
+                const points = basePoints * streakMultiplier + timeBonus;
+                
+                currentQuiz.score += points;
+                
+                // Проверяем достижения
+                checkAchievements();
+            }
+
+            // Обновляем статистику
+            updateStats();
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function checkAchievements() {
+            const achievements = [];
+            
+            // Серия правильных ответов
+            if (currentQuiz.streak >= 5) {
+                achievements.push('Серия из 5 правильных ответов!');
+            }
+            if (currentQuiz.streak >= 10) {
+                achievements.push('Невероятная серия из 10 ответов!');
+            }
+            
+            // Быстрые ответы
+            if (currentQuiz.timeLeft > 20) {
+                achievements.push('Быстрый ответ!');
+            }
+            
+            // Без подсказок
+            if (currentQuiz.hintsUsed === 0 && currentQuiz.currentQuestionIndex === currentQuiz.questions.length - 1) {
+                achievements.push('Прошел без подсказок!');
+            }
+            
+            // Особые достижения для невозможной сложности
+            if (currentQuiz.difficulty === 'impossible') {
+                if (currentQuiz.streak >= 3) {
+                    achievements.push('Легендарная серия на невозможной сложности!');
+                }
+                if (currentQuiz.timeLeft > 15) {
+                    achievements.push('Молниеносный ответ эксперта!');
+                }
+            }
+            
+            currentQuiz.achievements = [...new Set([...currentQuiz.achievements, ...achievements])];
+        }
+
+        function nextQuestion() {
+            currentQuiz.currentQuestionIndex++;
+            
+            if (currentQuiz.currentQuestionIndex < currentQuiz.questions.length) {
+                loadQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+        function startTimer() {
+            resetTimer();
+            currentQuiz.timer = setInterval(() => {
+                currentQuiz.timeLeft--;
+                document.getElementById('timer').textContent = currentQuiz.timeLeft;
+                
+                if (currentQuiz.timeLeft <= 0) {
+                    clearInterval(currentQuiz.timer);
+                    // Автоматически переходим к следующему вопросу
+                    if (document.getElementById('nextBtn').disabled) {
+                        selectAnswer(-1);
+                    }
+                    setTimeout(() => nextQuestion(), 1000);
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(currentQuiz.timer);
+            const baseTime = {
+                'easy': 45,
+                'medium': 30,
+                'hard': 25,
+                'expert': 20,
+                'impossible': 15
+            }[currentQuiz.difficulty] || 30;
+            
+            currentQuiz.timeLeft = baseTime;
+            document.getElementById('timer').textContent = currentQuiz.timeLeft;
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = currentQuiz.score;
+            document.getElementById('streak').textContent = `×${Math.min(5, Math.floor(currentQuiz.streak / 3) + 1)}`;
+        }
+
+        function endQuiz() {
+            clearInterval(currentQuiz.timer);
+            
+            const totalTime = Math.floor((Date.now() - currentQuiz.startTime) / 1000);
+            const minutes = Math.floor(totalTime / 60);
+            const seconds = totalTime % 60;
+            const percentage = Math.round((currentQuiz.correctAnswers / currentQuiz.questions.length) * 100);
+            
+            // Определяем результат с особыми сообщениями для невозможной сложности
+            let resultIcon, resultTitle, resultMessage;
+            
+            if (currentQuiz.difficulty === 'impossible') {
+                if (percentage >= 80) {
+                    resultIcon = "👑"; resultTitle = "ГЕНИЙ БОТАНИКИ!"; 
+                    resultMessage = "Вы прошли уровень МГУ! Поздравляем с невероятным достижением!";
+                } else if (percentage >= 60) {
+                    resultIcon = "🎓"; resultTitle = "БУДУЩИЙ УЧЕНЫЙ!"; 
+                    resultMessage = "Отличный результат для уровня МГУ! Вы действительно разбираетесь в ботанике!";
+                } else if (percentage >= 40) {
+                    resultIcon = "📚"; resultTitle = "ПЕРСПЕКТИВНЫЙ СТУДЕНТ"; 
+                    resultMessage = "Хорошая попытка! Вопросы уровня МГУ действительно сложные.";
+                } else {
+                    resultIcon = "💪"; resultTitle = "СМЕЛЫЙ ИССЛЕДОВАТЕЛЬ"; 
+                    resultMessage = "Не расстраивайтесь! Вопросы уровня МГУ сложны даже для профессионалов.";
+                }
+            } else {
+                if (percentage >= 90) {
+                    resultIcon = "🏆"; resultTitle = "ИДЕАЛЬНЫЙ РЕЗУЛЬТАТ!"; 
+                    resultMessage = "Вы настоящий эксперт по растениям! Поздравляем!";
+                } else if (percentage >= 70) {
+                    resultIcon = "🎉"; resultTitle = "ОТЛИЧНЫЙ РЕЗУЛЬТАТ!"; 
+                    resultMessage = "Отличные знания! Вы хорошо разбираетесь в садоводстве!";
+                } else if (percentage >= 50) {
+                    resultIcon = "👍"; resultTitle = "ХОРОШИЙ РЕЗУЛЬТАТ"; 
+                    resultMessage = "Неплохо! Есть куда расти, но основы вы знаете.";
+                } else {
+                    resultIcon = "🌱"; resultTitle = "ЕСТЬ КУДА РАСТИ"; 
+                    resultMessage = "Продолжайте изучать растения - это увлекательно!";
+                }
+            }
+            
+            // Обновляем элементы результата
+            document.getElementById('resultIcon').textContent = resultIcon;
+            document.getElementById('resultTitle').textContent = resultTitle;
+            document.getElementById('finalScore').textContent = percentage + '%';
+            document.getElementById('resultMessage').textContent = resultMessage;
+            
+            document.getElementById('resultCorrect').textContent = currentQuiz.correctAnswers + '/' + currentQuiz.questions.length;
+            document.getElementById('resultTime').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('resultStreak').textContent = '×' + Math.min(5, Math.floor(currentQuiz.maxStreak / 3) + 1);
+            
+            // Начисляем опыт с бонусами за сложность
+            const difficultyMultiplier = {
+                'easy': 1,
+                'medium': 1.5,
+                'hard': 2,
+                'expert': 3,
+                'impossible': 5
+            }[currentQuiz.difficulty] || 1;
+            
+            const xpEarned = Math.round((percentage * 2 + currentQuiz.maxStreak * 10) * difficultyMultiplier);
+            document.getElementById('resultXP').textContent = '+' + xpEarned;
+            
+            // Показываем достижения с особыми бейджами для невозможной сложности
+            const achievementsContainer = document.getElementById('achievementsEarned');
+            achievementsContainer.innerHTML = '';
+            if (currentQuiz.achievements.length > 0) {
+                achievementsContainer.innerHTML = '<h3 style="color: var(--primary-dark); margin-bottom: 10px;">Достижения:</h3>';
+                currentQuiz.achievements.forEach(achievement => {
+                    const badge = document.createElement('span');
+                    const isLegendary = currentQuiz.difficulty === 'impossible' && 
+                                       (achievement.includes('Легендарная') || achievement.includes('Молниеносный'));
+                    badge.className = isLegendary ? 'legendary-badge' : 'achievement-badge';
+                    badge.textContent = achievement;
+                    achievementsContainer.appendChild(badge);
+                });
+            }
+            
+            // Сохраняем результаты
+            saveQuizResults(percentage, xpEarned);
+            
+            // Показываем экран результатов
+            document.getElementById('quizScreen').style.display = 'none';
+            document.getElementById('resultScreen').style.display = 'block';
+        }
+
+        function saveQuizResults(percentage, xp) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            const userIndex = users.findIndex(u => u.email === currentUser.email);
+            
+            if (userIndex !== -1) {
+                if (!users[userIndex].quizStats) {
+                    users[userIndex].quizStats = {
+                        totalQuizzes: 0,
+                        bestScore: 0,
+                        totalCorrect: 0,
+                        totalQuestions: 0,
+                        totalXP: 0,
+                        byDifficulty: {},
+                        impossibleCompleted: false
+                    };
+                }
+                
+                const stats = users[userIndex].quizStats;
+                stats.totalQuizzes++;
+                stats.bestScore = Math.max(stats.bestScore, percentage);
+                stats.totalCorrect += currentQuiz.correctAnswers;
+                stats.totalQuestions += currentQuiz.questions.length;
+                stats.totalXP += xp;
+                
+                // Отмечаем прохождение невозможной сложности
+                if (currentQuiz.difficulty === 'impossible' && percentage >= 50) {
+                    stats.impossibleCompleted = true;
+                }
+                
+                // Сохраняем статистику по сложности
+                if (!stats.byDifficulty[currentQuiz.difficulty]) {
+                    stats.byDifficulty[currentQuiz.difficulty] = {
+                        played: 0,
+                        bestScore: 0,
+                        totalCorrect: 0
+                    };
+                }
+                stats.byDifficulty[currentQuiz.difficulty].played++;
+                stats.byDifficulty[currentQuiz.difficulty].bestScore = 
+                    Math.max(stats.byDifficulty[currentQuiz.difficulty].bestScore, percentage);
+                stats.byDifficulty[currentQuiz.difficulty].totalCorrect += currentQuiz.correctAnswers;
+                
+                // Начисляем опыт пользователю
+                users[userIndex].experience = (users[userIndex].experience || 0) + xp;
+                
+                localStorage.setItem('users', JSON.stringify(users));
+                loadUserStats();
+            }
+        }
+
+        function loadUserStats() {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            const userData = users.find(u => u.email === currentUser.email);
+            
+            if (userData && userData.quizStats) {
+                const stats = userData.quizStats;
+                document.getElementById('totalQuizzes').textContent = stats.totalQuizzes;
+                document.getElementById('bestScore').textContent = stats.bestScore + '%';
+                document.getElementById('correctAnswers').textContent = stats.totalCorrect;
+                
+                // Показываем специальный значок если пройдена невозможная сложность
+                if (stats.impossibleCompleted) {
+                    const bestScoreElement = document.getElementById('bestScore');
+                    bestScoreElement.innerHTML = stats.bestScore + '% <span class="legendary-badge">МГУ</span>';
+                }
+                
+                // Рассчитываем текущую серию на основе последних игр
+                const streak = Math.min(10, Math.floor(stats.totalCorrect / 10));
+                document.getElementById('currentStreak').textContent = streak;
+            }
+        }
+
+        function showStartScreen() {
+            document.getElementById('resultScreen').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'block';
+        }
+
+        function restartQuiz() {
+            document.getElementById('resultScreen').style.display = 'none';
+            document.getElementById('quizScreen').style.display = 'block';
+            startQuiz(currentQuiz.category);
+        }
+
+        function applyThemeSettings() {
+            const settings = JSON.parse(localStorage.getItem('appSettings')) || {};
+            
+            if (settings.theme) {
+                document.body.setAttribute('data-theme', settings.theme);
+                
+                if (settings.darkMode && settings.theme !== 'dark') {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            }
+            
+            if (settings.fontSize) {
+                document.body.style.fontSize = settings.fontSize + 'px';
+            }
+            if (settings.fontFamily) {
+                document.body.style.fontFamily = settings.fontFamily + ', sans-serif';
+            }
+        }
+    </script>
+</body>
+</html>

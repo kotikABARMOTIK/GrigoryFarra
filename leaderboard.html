@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Таблица лидеров - Garden Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="js/settings-manager.js"></script>
+    <script src="theme-manager.js"></script>
+    <script src="lang.js"></script>
+    <style>
+        [data-theme="dark"] {
+            --primary: #66bb6a;
+            --primary-dark: #388e3c;
+            --primary-light: #1b5e20;
+            --text: #ffffff;
+            --text-light: #b0b0b0;
+            --background: #121212;
+            --card-bg: #1e1e1e;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --border: #333333;
+            --gold: #ffd700;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+        }
+
+        [data-theme="green"] {
+            --primary: #4CAF50;
+            --primary-dark: #2E7D32;
+            --primary-light: #E8F5E9;
+            --text: #1B5E20;
+            --text-light: #4CAF50;
+            --background: #F1F8E9;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(76, 175, 80, 0.15);
+            --border: #C8E6C9;
+            --gold: #ffd700;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+        }
+
+        [data-theme="blue"] {
+            --primary: #2196F3;
+            --primary-dark: #1976D2;
+            --primary-light: #E3F2FD;
+            --text: #0D47A1;
+            --text-light: #2196F3;
+            --background: #E3F2FD;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(33, 150, 243, 0.15);
+            --border: #BBDEFB;
+            --gold: #ffd700;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+        }
+
+        [data-theme="green"].dark-mode {
+            --primary: #66bb6a;
+            --primary-dark: #388e3c;
+            --primary-light: #1b5e20;
+            --text: #e8f5e9;
+            --text-light: #a5d6a7;
+            --background: #1b311c;
+            --card-bg: #2e4630;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --border: #1b5e20;
+            --gold: #ffd700;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+        }
+
+        [data-theme="blue"].dark-mode {
+            --primary: #64b5f6;
+            --primary-dark: #1976d2;
+            --primary-light: #0d47a1;
+            --text: #e3f2fd;
+            --text-light: #90caf9;
+            --background: #0d1b33;
+            --card-bg: #1e2b47;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --border: #1565c0;
+            --gold: #ffd700;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        header {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .leaderboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .leaderboard-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .leaderboard-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .time-period {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .period-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            background: var(--card-bg);
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .period-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .period-btn:hover:not(.active) {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 10px 15px;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            background: var(--card-bg);
+            color: var(--text);
+            min-width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .refresh-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            transform: rotate(180deg);
+            background: var(--primary-dark);
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            border: 2px solid var(--border);
+            border-radius: 25px;
+            background: var(--card-bg);
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab.active, .tab:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .leaderboard-content {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .leaderboard-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .leaderboard-header-row {
+            display: grid;
+            grid-template-columns: 80px 1fr 120px 120px 120px 120px;
+            gap: 15px;
+            align-items: center;
+            padding: 15px 20px;
+            background: var(--primary-light);
+            border-bottom: 2px solid var(--border);
+            font-weight: 600;
+            color: var(--text);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .leaderboard-item {
+            display: grid;
+            grid-template-columns: 80px 1fr 120px 120px 120px 120px;
+            gap: 15px;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .leaderboard-item:hover {
+            background: var(--primary-light);
+            transform: translateX(5px);
+        }
+
+        .leaderboard-item.current-user {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            position: relative;
+        }
+
+        .rank {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .rank-1 { 
+            color: var(--gold);
+            font-size: 1.4em;
+        }
+        .rank-2 { 
+            color: var(--silver);
+            font-size: 1.3em;
+        }
+        .rank-3 { 
+            color: var(--bronze);
+            font-size: 1.3em;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+            position: relative;
+        }
+
+        .online-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4caf50;
+            border: 2px solid var(--card-bg);
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-level {
+            font-size: 0.9em;
+            color: var(--text-light);
+        }
+
+        .stat-value {
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: var(--text-light);
+            text-align: center;
+        }
+
+        .progress-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .progress-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: var(--text-light);
+        }
+
+        .user-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            color: var(--text-light);
+            font-size: 0.9em;
+        }
+
+        .achievements-showcase {
+            margin-top: 40px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .achievement-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .achievement-card.earned {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: scale(1.05);
+        }
+
+        .achievement-card.rare {
+            border-color: var(--gold);
+            background: linear-gradient(135deg, var(--primary-light), rgba(255, 215, 0, 0.1));
+        }
+
+        .achievement-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .achievement-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .achievement-description {
+            font-size: 0.9em;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .achievement-progress {
+            width: 100%;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .achievement-progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .top-three {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .podium-item {
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .podium-1 {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, var(--primary-light), rgba(255, 215, 0, 0.1));
+            border-color: var(--gold);
+        }
+
+        .podium-2 {
+            background: linear-gradient(135deg, var(--primary-light), rgba(192, 192, 192, 0.1));
+            border-color: var(--silver);
+        }
+
+        .podium-3 {
+            background: linear-gradient(135deg, var(--primary-light), rgba(205, 127, 50, 0.1));
+            border-color: var(--bronze);
+        }
+
+        .podium-rank {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .podium-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .podium-1 .podium-avatar { background: var(--gold); }
+        .podium-2 .podium-avatar { background: var(--silver); }
+        .podium-3 .podium-avatar { background: var(--bronze); }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 1910px;
+            background: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        @media (max-width: 768px) {
+            .leaderboard-header-row,
+            .leaderboard-item {
+                grid-template-columns: 60px 1fr 80px 80px;
+                font-size: 0.9em;
+            }
+            
+            .stat-value:nth-child(4),
+            .stat-value:nth-child(5),
+            .stat-label:nth-child(4),
+            .stat-label:nth-child(5) {
+                display: none;
+            }
+            
+            .top-three {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .podium-item {
+                transform: none !important;
+            }
+            
+            .controls-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                justify-content: center;
+            }
+            
+            .search-input {
+                min-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo" onclick="window.location.href='main-site.html'">
+            <div class="logo-icon">🌿</div>
+            <div class="logo-text">Garden Game</div>
+        </div>
+        <div>
+            <button class="btn btn-secondary" onclick="window.location.href='main-site.html'">
+                <i class="fas fa-arrow-left"></i> Назад в меню
+            </button>
+        </div>
+    </header>
+
+    <div class="leaderboard-container">
+        <div class="leaderboard-header">
+            <h1 class="leaderboard-title">🏆 Таблица лидеров</h1>
+            <p>Соревнуйтесь с другими садоводами и занимайте первые места!</p>
+        </div>
+
+        <div class="controls-row">
+            <div class="time-period">
+                <button class="period-btn active" onclick="setTimePeriod('all')">
+                    <i class="fas fa-infinity"></i> Все время
+                </button>
+                <button class="period-btn" onclick="setTimePeriod('month')">
+                    <i class="fas fa-calendar-alt"></i> Этот месяц
+                </button>
+                <button class="period-btn" onclick="setTimePeriod('week')">
+                    <i class="fas fa-calendar-week"></i> Эта неделя
+                </button>
+                <button class="period-btn" onclick="setTimePeriod('day')">
+                    <i class="fas fa-sun"></i> Сегодня
+                </button>
+            </div>
+            
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="Поиск игрока...">
+                <button class="refresh-btn" onclick="refreshLeaderboard()" title="Обновить">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showCategory('level')">
+                <i class="fas fa-star"></i> По уровню
+            </button>
+            <button class="tab" onclick="showCategory('experience')">
+                <i class="fas fa-chart-line"></i> По опыту
+            </button>
+            <button class="tab" onclick="showCategory('plants')">
+                <i class="fas fa-seedling"></i> По растениям
+            </button>
+            <button class="tab" onclick="showCategory('games')">
+                <i class="fas fa-gamepad"></i> По играм
+            </button>
+            <button class="tab" onclick="showCategory('friends')">
+                <i class="fas fa-users"></i> По друзьям
+            </button>
+        </div>
+
+        <!-- Топ-3 подиум -->
+        <div class="top-three" id="topThree">
+            <!-- Топ-3 игрока будут здесь -->
+        </div>
+
+        <!-- Прогресс до следующего места -->
+        <div class="progress-section" id="progressSection" style="display: none;">
+            <div class="progress-title" id="progressTitle"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text">
+                <span id="progressCurrent"></span>
+                <span id="progressNext"></span>
+            </div>
+        </div>
+
+        <!-- Статистика текущего пользователя -->
+        <div class="user-stats" id="userStats">
+            <!-- Статистика будет загружена через JS -->
+        </div>
+
+        <!-- Основная таблица лидеров -->
+        <div class="leaderboard-content">
+            <div class="leaderboard-header-row">
+                <div>Место</div>
+                <div>Игрок</div>
+                <div>
+                    <span id="currentCategoryLabel">Уровень</span>
+                </div>
+                <div>Опыт</div>
+                <div>Растения</div>
+                <div>Друзья</div>
+            </div>
+            <div class="leaderboard-list" id="leaderboardList">
+                <!-- Список лидеров будет загружен через JS -->
+            </div>
+        </div>
+
+        <!-- Достижения -->
+        <div class="achievements-showcase">
+            <h3 class="section-title">🎯 Популярные достижения</h3>
+            <div class="achievements-grid" id="topAchievements">
+                <!-- Топ достижения -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомление -->
+    <div id="notification" class="notification">
+        Таблица лидеров обновлена!
+    </div>
+
+    <script>
+        let currentCategory = 'level';
+        let currentPeriod = 'all';
+        let allUsers = [];
+
+        // База демонстрационных пользователей
+        const demoUsers = [
+            {
+                username: "Садовник",
+                email: "gardener@example.com",
+                level: 15,
+                experience: 12500,
+                plants: 45,
+                friends: 23,
+                online: true,
+                quizStats: { totalQuizzes: 67, correctAnswers: 289 },
+                gameStats: { matchPlays: 45, highScore: 1250 },
+                achievements: ['level_10', 'plant_collector', 'quiz_master'],
+                registeredAt: "2024-01-15"
+            },
+            {
+                username: "Флорист",
+                email: "florist@example.com",
+                level: 12,
+                experience: 9800,
+                plants: 38,
+                friends: 18,
+                online: false,
+                quizStats: { totalQuizzes: 45, correctAnswers: 198 },
+                gameStats: { matchPlays: 32, highScore: 980 },
+                achievements: ['level_10', 'plant_collector'],
+                registeredAt: "2024-02-10"
+            },
+            {
+                username: "Цветовод",
+                email: "flowergrower@example.com",
+                level: 11,
+                experience: 8700,
+                plants: 42,
+                friends: 15,
+                online: true,
+                quizStats: { totalQuizzes: 52, correctAnswers: 234 },
+                gameStats: { matchPlays: 38, highScore: 1100 },
+                achievements: ['level_10'],
+                registeredAt: "2024-01-28"
+            },
+            {
+                username: "Ландшафт",
+                email: "landscape@example.com",
+                level: 9,
+                experience: 6500,
+                plants: 28,
+                friends: 12,
+                online: true,
+                quizStats: { totalQuizzes: 34, correctAnswers: 156 },
+                gameStats: { matchPlays: 25, highScore: 780 },
+                achievements: [],
+                registeredAt: "2024-03-05"
+            },
+            {
+                username: "Розочка",
+                email: "rose@example.com",
+                level: 8,
+                experience: 5200,
+                plants: 22,
+                friends: 8,
+                online: false,
+                quizStats: { totalQuizzes: 28, correctAnswers: 123 },
+                gameStats: { matchPlays: 18, highScore: 650 },
+                achievements: [],
+                registeredAt: "2024-02-20"
+            },
+            {
+                username: "Солнышко",
+                email: "sunny@example.com",
+                level: 7,
+                experience: 4800,
+                plants: 19,
+                friends: 6,
+                online: true,
+                quizStats: { totalQuizzes: 23, correctAnswers: 98 },
+                gameStats: { matchPlays: 15, highScore: 520 },
+                achievements: [],
+                registeredAt: "2024-03-12"
+            },
+            {
+                username: "Тюльпан",
+                email: "tulip@example.com",
+                level: 6,
+                experience: 3500,
+                plants: 15,
+                friends: 5,
+                online: false,
+                quizStats: { totalQuizzes: 18, correctAnswers: 76 },
+                gameStats: { matchPlays: 12, highScore: 420 },
+                achievements: [],
+                registeredAt: "2024-03-18"
+            },
+            {
+                username: "Орхидея",
+                email: "orchid@example.com",
+                level: 5,
+                experience: 2800,
+                plants: 12,
+                friends: 4,
+                online: true,
+                quizStats: { totalQuizzes: 15, correctAnswers: 65 },
+                gameStats: { matchPlays: 10, highScore: 380 },
+                achievements: [],
+                registeredAt: "2024-03-22"
+            },
+            {
+                username: "Кактус",
+                email: "cactus@example.com",
+                level: 4,
+                experience: 1800,
+                plants: 8,
+                friends: 3,
+                online: false,
+                quizStats: { totalQuizzes: 10, correctAnswers: 42 },
+                gameStats: { matchPlays: 8, highScore: 290 },
+                achievements: [],
+                registeredAt: "2024-03-25"
+            },
+            {
+                username: "Подсолнух",
+                email: "sunflower@example.com",
+                level: 3,
+                experience: 1200,
+                plants: 6,
+                friends: 2,
+                online: true,
+                quizStats: { totalQuizzes: 7, correctAnswers: 28 },
+                gameStats: { matchPlays: 5, highScore: 180 },
+                achievements: [],
+                registeredAt: "2024-03-28"
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            initializeDemoData();
+            initializeLeaderboard();
+            setupSearch();
+        });
+
+        function initializeDemoData() {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            // Добавляем демо-пользователей если их нет
+            let hasChanges = false;
+            demoUsers.forEach(demoUser => {
+                if (!users.some(u => u.email === demoUser.email)) {
+                    users.push(demoUser);
+                    hasChanges = true;
+                }
+            });
+
+            // Обновляем текущего пользователя если нужно
+            const currentUserIndex = users.findIndex(u => u.email === currentUser.email);
+            if (currentUserIndex !== -1) {
+                if (!users[currentUserIndex].level) {
+                    users[currentUserIndex] = {
+                        ...users[currentUserIndex],
+                        level: 6,
+                        experience: 4200,
+                        plants: 18,
+                        friends: 7,
+                        online: true,
+                        quizStats: { totalQuizzes: 25, correctAnswers: 110 },
+                        gameStats: { matchPlays: 20, highScore: 680 },
+                        achievements: ['care_10'],
+                        registeredAt: new Date().toISOString().split('T')[0]
+                    };
+                    hasChanges = true;
+                }
+            }
+
+            if (hasChanges) {
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+        }
+
+        function initializeLeaderboard() {
+            loadLeaderboard();
+            loadUserStats();
+            loadTopAchievements();
+            
+            // Авто-обновление каждые 30 секунд
+            setInterval(() => {
+                loadLeaderboard();
+            }, 30000);
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', debounce(function() {
+                filterLeaderboard(this.value);
+            }, 300));
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function showCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('currentCategoryLabel').textContent = getStatLabel(category);
+            loadLeaderboard();
+        }
+
+        function setTimePeriod(period) {
+            currentPeriod = period;
+            document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            loadLeaderboard();
+        }
+
+        function refreshLeaderboard() {
+            showNotification('Таблица лидеров обновлена!');
+            loadLeaderboard();
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function loadLeaderboard() {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            allUsers = filterUsersByPeriod(users);
+            sortUsersByCategory(allUsers);
+            
+            displayTopThree(allUsers.slice(0, 3), currentUser);
+            displayLeaderboard(allUsers.slice(3), currentUser);
+            showProgressToNextRank(allUsers, currentUser);
+        }
+
+        function filterUsersByPeriod(users) {
+            const now = new Date();
+            return users.filter(user => {
+                if (!user.registeredAt) return true;
+                const regDate = new Date(user.registeredAt);
+                
+                switch (currentPeriod) {
+                    case 'month':
+                        return regDate.getMonth() === now.getMonth() && 
+                               regDate.getFullYear() === now.getFullYear();
+                    case 'week':
+                        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                        return regDate >= weekAgo;
+                    case 'day':
+                        return regDate.toDateString() === now.toDateString();
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        function sortUsersByCategory(users) {
+            users.sort((a, b) => {
+                const aValue = getStatValue(a, currentCategory);
+                const bValue = getStatValue(b, currentCategory);
+                return bValue - aValue;
+            });
+        }
+
+        function displayTopThree(topUsers, currentUser) {
+            const topThreeContainer = document.getElementById('topThree');
+            topThreeContainer.innerHTML = '';
+
+            const places = [
+                { rank: 1, class: 'podium-1', icon: '🥇' },
+                { rank: 2, class: 'podium-2', icon: '🥈' },
+                { rank: 3, class: 'podium-3', icon: '🥉' }
+            ];
+
+            places.forEach((place, index) => {
+                const user = topUsers[index];
+                if (!user) {
+                    // Заполнитель если нет пользователя
+                    const item = document.createElement('div');
+                    item.className = `podium-item`;
+                    item.innerHTML = `
+                        <div class="podium-rank">${place.icon}</div>
+                        <div class="podium-avatar">?</div>
+                        <div style="color: var(--text-light);">Место свободно</div>
+                    `;
+                    topThreeContainer.appendChild(item);
+                    return;
+                }
+
+                const isCurrentUser = user.email === currentUser.email;
+                const item = document.createElement('div');
+                item.className = `podium-item ${place.class}`;
+                
+                item.innerHTML = `
+                    <div class="podium-rank">${place.icon}</div>
+                    <div class="podium-avatar">${user.username.charAt(0).toUpperCase()}</div>
+                    <div style="font-weight: 600; margin-bottom: 5px;">
+                        ${user.username} ${isCurrentUser ? '👑' : ''}
+                    </div>
+                    <div style="color: var(--text-light); font-size: 0.9em; margin-bottom: 5px;">
+                        Уровень ${user.level || 1}
+                    </div>
+                    <div style="font-weight: bold; color: var(--primary);">
+                        ${getStatValue(user, currentCategory)} ${getStatUnit(currentCategory)}
+                    </div>
+                `;
+                
+                topThreeContainer.appendChild(item);
+            });
+        }
+
+        function displayLeaderboard(users, currentUser) {
+            const leaderboardList = document.getElementById('leaderboardList');
+            leaderboardList.innerHTML = '';
+
+            if (users.length === 0) {
+                leaderboardList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-light);">
+                        <i class="fas fa-inbox" style="font-size: 3em; margin-bottom: 15px; opacity: 0.5;"></i>
+                        <div>Нет данных для отображения</div>
+                    </div>
+                `;
+                return;
+            }
+
+            users.forEach((user, index) => {
+                const isCurrentUser = user.email === currentUser.email;
+                const rank = index + 4; // +4 потому что первые 3 уже в топе
+                
+                const item = document.createElement('div');
+                item.className = `leaderboard-item ${isCurrentUser ? 'current-user' : ''}`;
+                
+                item.innerHTML = `
+                    <div class="rank ${rank <= 3 ? `rank-${rank}` : ''}">
+                        ${rank <= 3 ? getRankIcon(rank) : ''}
+                        ${rank}
+                    </div>
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            ${user.username.charAt(0).toUpperCase()}
+                            ${user.online ? '<div class="online-indicator"></div>' : ''}
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name">
+                                ${user.username}
+                                ${isCurrentUser ? '<span style="color: var(--primary);">(Вы)</span>' : ''}
+                            </div>
+                            <div class="user-level">Уровень ${user.level || 1}</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="stat-value">${getStatValue(user, currentCategory)}</div>
+                        <div class="stat-label">${getStatLabel(currentCategory)}</div>
+                    </div>
+                    <div>
+                        <div class="stat-value">${user.experience || 0}</div>
+                        <div class="stat-label">Опыт</div>
+                    </div>
+                    <div>
+                        <div class="stat-value">${(user.plants || []).length}</div>
+                        <div class="stat-label">Растения</div>
+                    </div>
+                    <div>
+                        <div class="stat-value">${(user.friends || []).length}</div>
+                        <div class="stat-label">Друзья</div>
+                    </div>
+                `;
+                
+                leaderboardList.appendChild(item);
+            });
+        }
+
+        function showProgressToNextRank(users, currentUser) {
+            const progressSection = document.getElementById('progressSection');
+            const currentUserIndex = users.findIndex(u => u.email === currentUser.email);
+            
+            if (currentUserIndex === -1 || currentUserIndex < 3) {
+                progressSection.style.display = 'none';
+                return;
+            }
+
+            const currentUserData = users[currentUserIndex];
+            const nextUserData = users[currentUserIndex - 1];
+            
+            if (!nextUserData) {
+                progressSection.style.display = 'none';
+                return;
+            }
+
+            const currentValue = getStatValue(currentUserData, currentCategory);
+            const nextValue = getStatValue(nextUserData, currentCategory);
+            
+            if (currentValue >= nextValue) {
+                progressSection.style.display = 'none';
+                return;
+            }
+
+            const progress = ((currentValue / nextValue) * 100).toFixed(1);
+
+            document.getElementById('progressTitle').textContent = 
+                `До ${currentUserIndex} места: ${progress}%`;
+            document.getElementById('progressFill').style.width = `${Math.min(progress, 100)}%`;
+            document.getElementById('progressCurrent').textContent = 
+                `Ваш результат: ${currentValue}`;
+            document.getElementById('progressNext').textContent = 
+                `Нужно: ${nextValue + 1}`;
+
+            progressSection.style.display = 'block';
+        }
+
+        function filterLeaderboard(searchTerm) {
+            if (!searchTerm) {
+                const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+                displayLeaderboard(allUsers.slice(3), currentUser);
+                return;
+            }
+
+            const filteredUsers = allUsers.filter(user => 
+                user.username.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            displayLeaderboard(filteredUsers.slice(3), currentUser);
+        }
+
+        function getStatValue(user, category) {
+            switch (category) {
+                case 'level': return user.level || 1;
+                case 'experience': return user.experience || 0;
+                case 'plants': return (user.plants || []).length;
+                case 'games': 
+                    return (user.quizStats?.totalQuizzes || 0) + (user.gameStats?.matchPlays || 0);
+                case 'friends': return (user.friends || []).length;
+                default: return 0;
+            }
+        }
+
+        function getStatLabel(category) {
+            const labels = {
+                'level': 'Уровень',
+                'experience': 'Опыт',
+                'plants': 'Растения',
+                'games': 'Игры',
+                'friends': 'Друзья'
+            };
+            return labels[category] || category;
+        }
+
+        function getStatUnit(category) {
+            const units = {
+                'level': '',
+                'experience': 'XP',
+                'plants': '',
+                'games': '',
+                'friends': ''
+            };
+            return units[category] || '';
+        }
+
+        function getRankIcon(rank) {
+            const icons = {
+                1: '🥇',
+                2: '🥈', 
+                3: '🥉'
+            };
+            return icons[rank] || '';
+        }
+
+        function loadUserStats() {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            const userData = users.find(u => u.email === currentUser.email);
+            
+            if (!userData) return;
+
+            const userStats = document.getElementById('userStats');
+            userStats.innerHTML = '';
+
+            const stats = [
+                { 
+                    value: userData.level || 1, 
+                    label: 'Уровень', 
+                    icon: '⭐',
+                    description: 'Ваш текущий уровень'
+                },
+                { 
+                    value: userData.experience || 0, 
+                    label: 'Опыт', 
+                    icon: '📈',
+                    description: 'Накопленный опыт'
+                },
+                { 
+                    value: (userData.plants || []).length, 
+                    label: 'Растения', 
+                    icon: '🌱',
+                    description: 'Выращенные растения'
+                },
+                { 
+                    value: (userData.friends || []).length, 
+                    label: 'Друзья', 
+                    icon: '👥',
+                    description: 'Друзья в игре'
+                }
+            ];
+
+            stats.forEach(stat => {
+                const card = document.createElement('div');
+                card.className = 'stat-card';
+                card.innerHTML = `
+                    <div class="value">${stat.value}</div>
+                    <div class="label">${stat.icon} ${stat.label}</div>
+                    <div style="font-size: 0.8em; color: var(--text-light); margin-top: 8px;">
+                        ${stat.description}
+                    </div>
+                `;
+                userStats.appendChild(card);
+            });
+        }
+
+        function loadTopAchievements() {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            const currentUserData = users.find(u => u.email === currentUser.email);
+            const achievementsGrid = document.getElementById('topAchievements');
+            achievementsGrid.innerHTML = '';
+
+            const achievements = [
+                {
+                    id: 'level_10',
+                    name: 'Мастер садоводства',
+                    description: 'Достигните 10 уровня',
+                    icon: '🏆',
+                    rare: true,
+                    progress: Math.min(((currentUserData?.level || 1) / 10) * 100, 100)
+                },
+                {
+                    id: 'plant_collector',
+                    name: 'Коллекционер',
+                    description: 'Соберите 20 растений',
+                    icon: '🌺',
+                    rare: false,
+                    progress: Math.min((((currentUserData?.plants || []).length) / 20) * 100, 100)
+                },
+                {
+                    id: 'quiz_master',
+                    name: 'Знаток растений',
+                    description: 'Пройдите 50 квизов',
+                    icon: '🎯',
+                    rare: false,
+                    progress: Math.min(((currentUserData?.quizStats?.totalQuizzes || 0) / 50) * 100, 100)
+                },
+                {
+                    id: 'social_butterfly',
+                    name: 'Социальная бабочка',
+                    description: 'Добавьте 10 друзей',
+                    icon: '🦋',
+                    rare: true,
+                    progress: Math.min((((currentUserData?.friends || []).length) / 10) * 100, 100)
+                }
+            ];
+
+            achievements.forEach(achievement => {
+                const card = document.createElement('div');
+                const isEarned = achievement.progress >= 100;
+                card.className = `achievement-card ${isEarned ? 'earned' : ''} ${achievement.rare ? 'rare' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="achievement-icon">${achievement.icon}</div>
+                    <div class="achievement-name">${achievement.name}</div>
+                    <div class="achievement-description">${achievement.description}</div>
+                    <div class="achievement-progress">
+                        <div class="achievement-progress-fill" style="width: ${achievement.progress}%"></div>
+                    </div>
+                    <div style="font-size: 0.8em; color: var(--text-light);">
+                        ${isEarned ? '✅ Получено' : `${achievement.progress.toFixed(0)}% завершено`}
+                    </div>
+                `;
+                achievementsGrid.appendChild(card);
+            });
+        }
+    </script>
+    <script>
+// Общий код для применения темы на всех страницах
+function applyThemeSettings() {
+    const settings = JSON.parse(localStorage.getItem('appSettings')) || {};
+    
+    if (settings.theme) {
+        document.body.setAttribute('data-theme', settings.theme);
+        
+        // Применяем dark mode для не-темных тем
+        if (settings.darkMode && settings.theme !== 'dark') {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+    }
+    
+    // Применяем настройки шрифта если есть
+    if (settings.fontSize) {
+        document.body.style.fontSize = settings.fontSize + 'px';
+    }
+    if (settings.fontFamily) {
+        document.body.style.fontFamily = settings.fontFamily + ', sans-serif';
+    }
+}
+
+// Применяем настройки при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    applyThemeSettings();
+});
+</script>
+</body>
+</html>

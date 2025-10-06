@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Цветочный матч - Garden Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="js/settings-manager.js"></script>
+    <script src="theme-manager.js"></script>
+    <script src="lang.js"></script>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #2E7D32;
+            --primary-light: #E8F5E9;
+            --accent: #FF4081;
+            --text: #333333;
+            --text-light: #666666;
+            --background: #F9F9F9;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --radius: 16px;
+            --border: #e0e0e0;
+        }
+
+        [data-theme="dark"] {
+            --primary: #66bb6a;
+            --primary-dark: #388e3c;
+            --primary-light: #1b5e20;
+            --text: #ffffff;
+            --text-light: #b0b0b0;
+            --background: #121212;
+            --card-bg: #1e1e1e;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --border: #333333;
+        }
+
+        [data-theme="green"] {
+            --primary: #4CAF50;
+            --primary-dark: #2E7D32;
+            --primary-light: #E8F5E9;
+            --text: #1B5E20;
+            --text-light: #4CAF50;
+            --background: #F1F8E9;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(76, 175, 80, 0.15);
+            --border: #C8E6C9;
+        }
+
+        [data-theme="blue"] {
+            --primary: #2196F3;
+            --primary-dark: #1976D2;
+            --primary-light: #E3F2FD;
+            --text: #0D47A1;
+            --text-light: #2196F3;
+            --background: #E3F2FD;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(33, 150, 243, 0.15);
+            --border: #BBDEFB;
+        }
+
+        [data-theme="green"].dark-mode {
+            --primary: #66bb6a;
+            --primary-dark: #388e3c;
+            --primary-light: #1b5e20;
+            --text: #e8f5e9;
+            --text-light: #a5d6a7;
+            --background: #1b311c;
+            --card-bg: #2e4630;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --border: #1b5e20;
+        }
+
+        [data-theme="blue"].dark-mode {
+            --primary: #64b5f6;
+            --primary-dark: #1976d2;
+            --primary-light: #0d47a1;
+            --text: #e3f2fd;
+            --text-light: #90caf9;
+            --background: #0d1b33;
+            --card-bg: #1e2b47;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --border: #1565c0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .flower {
+            position: fixed;
+            z-index: 0;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .flower-1 {
+            top: 10%;
+            left: 10%;
+            font-size: 40px;
+            color: var(--primary);
+            transform: rotate(-15deg);
+        }
+
+        .flower-2 {
+            bottom: 15%;
+            right: 10%;
+            font-size: 35px;
+            color: var(--primary-dark);
+            transform: rotate(25deg);
+        }
+
+        .flower-3 {
+            top: 20%;
+            right: 15%;
+            font-size: 30px;
+            color: var(--accent);
+            transform: rotate(10deg);
+        }
+
+        .flower-4 {
+            bottom: 20%;
+            left: 15%;
+            font-size: 45px;
+            color: var(--primary-light);
+            transform: rotate(-20deg);
+        }
+
+        .petal {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            border-radius: 50% 50% 50% 0;
+            opacity: 0.6;
+            animation: fall 15s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 0.7; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--primary-dark);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-icon {
+            font-size: 2em;
+            color: var(--primary);
+        }
+
+        header {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+            position: relative;
+            z-index: 2;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border: 1px solid var(--border);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .game-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .game-board {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .game-info {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .game-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .game-description {
+            color: var(--text-light);
+            margin-bottom: 30px;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .features-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .features-list i {
+            width: 20px;
+            text-align: center;
+            color: var(--primary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--primary-light);
+            padding: 20px;
+            border-radius: var(--radius);
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9em;
+        }
+
+        .play-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .play-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .cards-grid.hard-mode {
+            grid-template-columns: repeat(6, 1fr);
+        }
+
+        .card {
+            aspect-ratio: 1;
+            background: var(--primary-light);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid var(--border);
+            user-select: none;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            border-color: var(--primary);
+        }
+
+        .card .card-front,
+        .card .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backface-visibility: hidden;
+            transition: transform 0.6s;
+            border-radius: 10px;
+        }
+
+        .card .card-front {
+            background: #2c3e50;
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .card .card-back {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            transform: rotateY(0deg);
+        }
+
+        .card.flipped .card-front {
+            transform: rotateY(0deg);
+        }
+
+        .card.flipped .card-back {
+            transform: rotateY(180deg);
+        }
+
+        .card.matched .card-front {
+            background: var(--primary);
+            color: white;
+        }
+
+        .game-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .control-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .timer {
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            color: var(--primary-dark);
+            margin: 20px 0;
+            padding: 10px;
+            background: var(--primary-light);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.2em;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            padding: 10px;
+            background: var(--primary-light);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        .rewards {
+            background: var(--primary-light);
+            padding: 20px;
+            border-radius: var(--radius);
+            margin-top: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .rewards-title {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .reward-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 0;
+        }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .difficulty-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .difficulty-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .difficulty-btn:hover:not(.active) {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .game-status {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 8px;
+            background: var(--primary-light);
+            display: none;
+            border: 1px solid var(--border);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: var(--radius);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .modal-title {
+            font-size: 2em;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .modal-stats {
+            margin: 20px 0;
+        }
+
+        .modal-stat {
+            margin: 10px 0;
+            font-size: 1.1em;
+            padding: 8px;
+            background: var(--primary-light);
+            border-radius: 8px;
+        }
+
+        .petals-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .logo-text {
+                font-size: 1.8em;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .game-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-info {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .cards-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .cards-grid.hard-mode {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .difficulty-selector {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .cards-grid.hard-mode {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="flower flower-1">✿</div>
+    <div class="flower flower-2">✿</div>
+    <div class="flower flower-3">✿</div>
+    <div class="flower flower-4">✿</div>
+    
+    <div class="petals-container" id="petalsContainer"></div>
+
+    <div class="container">
+        <header>
+            <div class="logo" onclick="window.location.href='main-site.html'">
+                <div class="logo-icon">🌸</div>
+                <div class="logo-text">Flower Match</div>
+            </div>
+            <div>
+                <button class="btn btn-secondary" onclick="window.location.href='games.html'">
+                    <i class="fas fa-arrow-left"></i> Назад к играм
+                </button>
+            </div>
+        </header>
+
+        <div class="game-container">
+            <div class="game-board">
+                <h1 class="game-title">Цветочный матч</h1>
+                <p class="game-description">
+                    Находите пары одинаковых цветов в этой увлекательной игре на память. 
+                    Развивайте внимание и получайте награды!
+                </p>
+
+                <div class="difficulty-selector">
+                    <button class="difficulty-btn active" data-difficulty="easy">Легкий</button>
+                    <button class="difficulty-btn" data-difficulty="medium">Средний</button>
+                    <button class="difficulty-btn" data-difficulty="hard">Сложный</button>
+                </div>
+
+                <div class="game-controls">
+                    <button class="control-btn" onclick="startGame()">
+                        <i class="fas fa-play"></i> Новая игра
+                    </button>
+                    <button class="control-btn" onclick="resetGame()">
+                        <i class="fas fa-redo"></i> Сбросить
+                    </button>
+                </div>
+
+                <div class="game-status" id="gameStatus">
+                    Запоминайте расположение карточек!
+                </div>
+
+                <div class="timer" id="timer">01:00</div>
+                <div class="score-display" id="score">Найдено пар: 0/8</div>
+
+                <div class="cards-grid" id="cardsGrid">
+                    <!-- Cards will be generated here -->
+                </div>
+            </div>
+
+            <div class="game-info">
+                <h3 style="color: var(--primary-dark); margin-bottom: 20px; text-align: center;">
+                    <i class="fas fa-info-circle"></i> Особенности игры
+                </h3>
+                <ul class="features-list">
+                    <li><i class="fas fa-brain"></i> Развивает память</li>
+                    <li><i class="fas fa-coins"></i> Награды: монеты и опыт</li>
+                    <li><i class="fas fa-clock"></i> Игра на время</li>
+                    <li><i class="fas fa-layer-group"></i> Уровни сложности</li>
+                </ul>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="bestScore">0</div>
+                        <div class="stat-label">Рекорд</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="gamesPlayed">0</div>
+                        <div class="stat-label">Сыграно раз</div>
+                    </div>
+                </div>
+
+                <button class="play-btn" onclick="startGame()">
+                    <i class="fas fa-gamepad"></i> Играть сейчас
+                </button>
+
+                <div class="rewards">
+                    <div class="rewards-title">
+                        <i class="fas fa-gift"></i> Награды за игру:
+                    </div>
+                    <div class="reward-item">
+                        <i class="fas fa-star" style="color: gold;"></i>
+                        <span>За победу: 10 монет + 5 опыта</span>
+                    </div>
+                    <div class="reward-item">
+                        <i class="fas fa-stopwatch" style="color: #2196F3;"></i>
+                        <span>Бонус за время: до 5 дополнительных монет</span>
+                    </div>
+                    <div class="reward-item">
+                        <i class="fas fa-trophy" style="color: #FF9800;"></i>
+                        <span>Новый рекорд: 25 монет</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="gameOverModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modalTitle">Поздравляем!</h2>
+            <div class="modal-stats">
+                <div class="modal-stat" id="modalTime">Время: 00:00</div>
+                <div class="modal-stat" id="modalScore">Найдено пар: 0/8</div>
+                <div class="modal-stat" id="modalReward">Награда: 0 монет</div>
+            </div>
+            <button class="play-btn" onclick="closeModal()">
+                <i class="fas fa-redo"></i> Играть снова
+            </button>
+        </div>
+    </div>
+
+    <script>
+        class FlowerMatchGame {
+            constructor() {
+                this.cards = [];
+                this.flippedCards = [];
+                this.matchedPairs = 0;
+                this.totalPairs = 8;
+                this.timeLeft = 60;
+                this.timer = null;
+                this.isGameActive = false;
+                this.isShowingCards = false;
+                this.gameStats = this.loadStats();
+                this.currentDifficulty = 'easy';
+                
+                this.flowers = ['🌹', '🌻', '🌸', '🌺', '🌷', '💐', '🍀', '🌼', '🌵', '🌴', '🌾', '🌿', '🌱', '☘️', '🌲', '🌳'];
+                this.init();
+            }
+
+            init() {
+                this.setupDifficultySelector();
+                this.generateCards();
+                this.hideAllCards();
+                this.updateStats();
+                this.setupEventListeners();
+                this.createPetals();
+            }
+
+            setupDifficultySelector() {
+                const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+                difficultyButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        difficultyButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        this.currentDifficulty = button.dataset.difficulty;
+                        this.resetGame();
+                    });
+                });
+            }
+
+            generateCards() {
+                const grid = document.getElementById('cardsGrid');
+                grid.innerHTML = '';
+                
+                // Убираем класс hard-mode если он был
+                grid.classList.remove('hard-mode');
+                
+                let gridColumns;
+                let timeLimit;
+                
+                switch(this.currentDifficulty) {
+                    case 'easy':
+                        this.totalPairs = 8;
+                        gridColumns = 4;
+                        timeLimit = 60;
+                        break;
+                    case 'medium':
+                        this.totalPairs = 12;
+                        gridColumns = 4;
+                        timeLimit = 90;
+                        break;
+                    case 'hard':
+                        this.totalPairs = 16; // Исправлено: 18 карточек для 6x6 сетки
+                        gridColumns = 6;
+                        timeLimit = 120;
+                        grid.classList.add('hard-mode');
+                        break;
+                }
+                
+                this.timeLeft = timeLimit;
+                this.matchedPairs = 0;
+                this.updateScore();
+                
+                const selectedFlowers = this.flowers.slice(0, this.totalPairs);
+                let cardFlowers = [...selectedFlowers, ...selectedFlowers];
+                cardFlowers = this.shuffleArray(cardFlowers);
+                
+                this.cards = cardFlowers.map((flower, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.dataset.index = index;
+                    card.dataset.flower = flower;
+                    
+                    // Front side (цветок)
+                    const cardFront = document.createElement('div');
+                    cardFront.className = 'card-front';
+                    cardFront.textContent = flower;
+                    
+                    // Back side (знак вопроса)
+                    const cardBack = document.createElement('div');
+                    cardBack.className = 'card-back';
+                    cardBack.innerHTML = '<i class="fas fa-question" style="font-size: 1.5em;"></i>';
+                    
+                    card.appendChild(cardFront);
+                    card.appendChild(cardBack);
+                    
+                    card.addEventListener('click', () => this.flipCard(card));
+                    grid.appendChild(card);
+                    
+                    return {
+                        element: card,
+                        flower: flower,
+                        isFlipped: false,
+                        isMatched: false
+                    };
+                });
+                
+                this.updateTimer();
+            }
+
+            shuffleArray(array) {
+                const newArray = [...array];
+                for (let i = newArray.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+                }
+                return newArray;
+            }
+
+            flipCard(cardElement) {
+                if (!this.isGameActive || this.isShowingCards) return;
+                if (this.flippedCards.length >= 2) return;
+                
+                const cardIndex = parseInt(cardElement.dataset.index);
+                const card = this.cards[cardIndex];
+                
+                if (card.isFlipped || card.isMatched) return;
+                
+                card.isFlipped = true;
+                cardElement.classList.add('flipped');
+                this.flippedCards.push(card);
+                
+                if (this.flippedCards.length === 2) {
+                    this.checkMatch();
+                }
+            }
+
+            checkMatch() {
+                const [card1, card2] = this.flippedCards;
+                
+                if (card1.flower === card2.flower) {
+                    card1.isMatched = true;
+                    card2.isMatched = true;
+                    card1.element.classList.add('matched');
+                    card2.element.classList.add('matched');
+                    
+                    this.matchedPairs++;
+                    this.updateScore();
+                    
+                    if (this.matchedPairs === this.totalPairs) {
+                        this.gameWon();
+                    }
+                    
+                    this.flippedCards = [];
+                } else {
+                    setTimeout(() => {
+                        card1.isFlipped = false;
+                        card2.isFlipped = false;
+                        card1.element.classList.remove('flipped');
+                        card2.element.classList.remove('flipped');
+                        this.flippedCards = [];
+                    }, 1000);
+                }
+            }
+
+            startGame() {
+                if (this.isGameActive) return;
+                
+                this.resetGame();
+                this.isGameActive = true;
+                
+                const statusElement = document.getElementById('gameStatus');
+                statusElement.style.display = 'block';
+                statusElement.textContent = 'Запоминайте расположение карточек!';
+                
+                this.showAllCards();
+                
+                this.gameStats.gamesPlayed++;
+                this.saveStats();
+                this.updateStats();
+            }
+
+            showAllCards() {
+                this.isShowingCards = true;
+                
+                this.cards.forEach(card => {
+                    card.element.classList.add('flipped');
+                });
+                
+                setTimeout(() => {
+                    this.hideAllCards();
+                    this.isShowingCards = false;
+                    this.startTimer();
+                    
+                    const statusElement = document.getElementById('gameStatus');
+                    statusElement.textContent = 'Находите пары карточек!';
+                }, 3000);
+            }
+
+            hideAllCards() {
+                this.cards.forEach(card => {
+                    card.element.classList.remove('flipped');
+                    card.isFlipped = false;
+                });
+                this.flippedCards = [];
+            }
+
+            startTimer() {
+                this.updateTimer();
+                
+                this.timer = setInterval(() => {
+                    this.timeLeft--;
+                    this.updateTimer();
+                    
+                    if (this.timeLeft <= 0) {
+                        this.gameOver();
+                    }
+                }, 1000);
+            }
+
+            updateTimer() {
+                const timerElement = document.getElementById('timer');
+                const minutes = Math.floor(this.timeLeft / 60);
+                const seconds = this.timeLeft % 60;
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (this.timeLeft <= 10) {
+                    timerElement.style.color = '#f44336';
+                } else {
+                    timerElement.style.color = 'var(--primary-dark)';
+                }
+            }
+
+            updateScore() {
+                const scoreElement = document.getElementById('score');
+                scoreElement.textContent = `Найдено пар: ${this.matchedPairs}/${this.totalPairs}`;
+            }
+
+            gameWon() {
+                clearInterval(this.timer);
+                this.isGameActive = false;
+                
+                document.getElementById('gameStatus').style.display = 'none';
+                
+                // Базовые награды в зависимости от сложности
+                let baseReward;
+                let timeBonusMultiplier;
+                
+                switch(this.currentDifficulty) {
+                    case 'easy':
+                        baseReward = 10;
+                        timeBonusMultiplier = 3;
+                        break;
+                    case 'medium':
+                        baseReward = 15;
+                        timeBonusMultiplier = 4;
+                        break;
+                    case 'hard':
+                        baseReward = 20;
+                        timeBonusMultiplier = 5;
+                        break;
+                }
+                
+                const timeBonus = Math.floor(this.timeLeft / timeBonusMultiplier);
+                let totalCoins = baseReward + timeBonus;
+                
+                // Бонус опыта
+                const experienceReward = 5 + (this.currentDifficulty === 'hard' ? 5 : 0);
+                
+                // Проверка рекорда
+                const isNewRecord = this.timeLeft > this.gameStats.bestTime;
+                if (isNewRecord) {
+                    this.gameStats.bestTime = this.timeLeft;
+                    totalCoins += 15;
+                }
+                
+                this.gameStats.totalCoins += totalCoins;
+                this.gameStats.totalExperience += experienceReward;
+                this.saveStats();
+                
+                this.updateUserCoins(totalCoins, experienceReward);
+                this.showGameOverModal(true, totalCoins, isNewRecord);
+            }
+
+            gameOver() {
+                clearInterval(this.timer);
+                this.isGameActive = false;
+                document.getElementById('gameStatus').style.display = 'none';
+                this.showGameOverModal(false, 0, false);
+            }
+
+            showGameOverModal(isWin, coins, isNewRecord) {
+                const modal = document.getElementById('gameOverModal');
+                const title = document.getElementById('modalTitle');
+                const time = document.getElementById('modalTime');
+                const score = document.getElementById('modalScore');
+                const reward = document.getElementById('modalReward');
+                
+                if (isWin) {
+                    title.textContent = isNewRecord ? '🎉 Новый рекорд! 🎉' : 'Поздравляем!';
+                    title.style.color = 'var(--primary)';
+                } else {
+                    title.textContent = 'Время вышло!';
+                    title.style.color = '#f44336';
+                }
+                
+                const totalTime = this.getInitialTime() - this.timeLeft;
+                const minutes = Math.floor(totalTime / 60);
+                const seconds = totalTime % 60;
+                time.textContent = `Время: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                score.textContent = `Найдено пар: ${this.matchedPairs}/${this.totalPairs}`;
+                reward.textContent = `Награда: ${coins} монет`;
+                
+                modal.style.display = 'flex';
+            }
+
+            getInitialTime() {
+                switch(this.currentDifficulty) {
+                    case 'easy': return 60;
+                    case 'medium': return 90;
+                    case 'hard': return 120;
+                }
+            }
+
+            resetGame() {
+                clearInterval(this.timer);
+                this.isGameActive = false;
+                this.isShowingCards = false;
+                this.matchedPairs = 0;
+                this.flippedCards = [];
+                
+                // Устанавливаем время в зависимости от сложности
+                this.timeLeft = this.getInitialTime();
+                
+                document.getElementById('gameStatus').style.display = 'none';
+                
+                this.generateCards();
+                this.hideAllCards();
+                this.updateScore();
+                this.updateTimer();
+                
+                const timerElement = document.getElementById('timer');
+                timerElement.style.color = 'var(--primary-dark)';
+            }
+
+            loadStats() {
+                const stats = localStorage.getItem('flowerMatchStats');
+                return stats ? JSON.parse(stats) : {
+                    gamesPlayed: 0,
+                    bestTime: 0,
+                    totalCoins: 0,
+                    totalExperience: 0
+                };
+            }
+
+            saveStats() {
+                localStorage.setItem('flowerMatchStats', JSON.stringify(this.gameStats));
+            }
+
+            updateStats() {
+                document.getElementById('bestScore').textContent = this.gameStats.bestTime;
+                document.getElementById('gamesPlayed').textContent = this.gameStats.gamesPlayed;
+            }
+
+            setupEventListeners() {
+                document.getElementById('gameOverModal').addEventListener('click', (e) => {
+                    if (e.target === document.getElementById('gameOverModal')) {
+                        this.closeModal();
+                    }
+                });
+            }
+
+            closeModal() {
+                document.getElementById('gameOverModal').style.display = 'none';
+                this.resetGame();
+            }
+
+            createPetals() {
+                const container = document.getElementById('petalsContainer');
+                const petalCount = 15;
+                
+                for (let i = 0; i < petalCount; i++) {
+                    const petal = document.createElement('div');
+                    petal.classList.add('petal');
+                    
+                    const size = Math.random() * 15 + 5;
+                    const left = Math.random() * 100;
+                    const delay = Math.random() * 15;
+                    const duration = Math.random() * 10 + 15;
+                    
+                    petal.style.width = `${size}px`;
+                    petal.style.height = `${size}px`;
+                    petal.style.left = `${left}vw`;
+                    petal.style.animationDelay = `${delay}s`;
+                    petal.style.animationDuration = `${duration}s`;
+                    
+                    const colors = [
+                        'var(--primary)',
+                        'var(--primary-dark)',
+                        'var(--accent)',
+                        'var(--primary-light)'
+                    ];
+                    petal.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    container.appendChild(petal);
+                }
+            }
+
+            updateUserCoins(coins, experience) {
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+                if (currentUser) {
+                    const userIndex = users.findIndex(u => u.email === currentUser.email);
+                    
+                    if (userIndex !== -1) {
+                        users[userIndex].coins = (users[userIndex].coins || 100) + coins;
+                        users[userIndex].experience = (users[userIndex].experience || 0) + experience;
+                        localStorage.setItem('users', JSON.stringify(users));
+                    }
+                }
+            }
+        }
+
+        // Global functions
+        let game;
+
+        function startGame() {
+            game.startGame();
+        }
+
+        function resetGame() {
+            game.resetGame();
+        }
+
+        function closeModal() {
+            game.closeModal();
+        }
+
+        // Initialize game when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (!currentUser) {
+                window.location.href = 'registration.html';
+                return;
+            }
+            
+            game = new FlowerMatchGame();
+            applyThemeSettings();
+        });
+
+        // Theme application function
+        function applyThemeSettings() {
+            const settings = JSON.parse(localStorage.getItem('appSettings')) || {};
+            
+            if (settings.theme) {
+                document.body.setAttribute('data-theme', settings.theme);
+                
+                if (settings.darkMode && settings.theme !== 'dark') {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            }
+            
+            if (settings.fontSize) {
+                document.body.style.fontSize = settings.fontSize + 'px';
+            }
+            if (settings.fontFamily) {
+                document.body.style.fontFamily = settings.fontFamily + ', sans-serif';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игры - Garden Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="js/settings-manager.js"></script>
+    <script src="theme-manager.js"></script>
+    <script src="lang.js"></script>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #2E7D32;
+            --primary-light: #E8F5E9;
+            --accent: #FF4081;
+            --text: #333333;
+            --text-light: #666666;
+            --background: #F9F9F9;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --radius: 16px;
+            --transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] {
+            --primary: #66bb6a;
+            --primary-dark: #388e3c;
+            --primary-light: #1b5e20;
+            --text: #ffffff;
+            --text-light: #b0b0b0;
+            --background: #121212;
+            --card-bg: #1e1e1e;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --border: #333333;
+        }
+
+        [data-theme="green"] {
+            --primary: #4CAF50;
+            --primary-dark: #2E7D32;
+            --primary-light: #E8F5E9;
+            --text: #1B5E20;
+            --text-light: #4CAF50;
+            --background: #F1F8E9;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(76, 175, 80, 0.15);
+            --border: #C8E6C9;
+        }
+
+        [data-theme="blue"] {
+            --primary: #2196F3;
+            --primary-dark: #1976D2;
+            --primary-light: #E3F2FD;
+            --text: #0D47A1;
+            --text-light: #2196F3;
+            --background: #E3F2FD;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 20px rgba(33, 150, 243, 0.15);
+            --border: #BBDEFB;
+        }
+
+        [data-theme="green"].dark-mode {
+            --primary: #66bb6a;
+            --primary-dark: #388e3c;
+            --primary-light: #1b5e20;
+            --text: #e8f5e9;
+            --text-light: #a5d6a7;
+            --background: #1b311c;
+            --card-bg: #2e4630;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --border: #1b5e20;
+        }
+
+        [data-theme="blue"].dark-mode {
+            --primary: #64b5f6;
+            --primary-dark: #1976d2;
+            --primary-light: #0d47a1;
+            --text: #e3f2fd;
+            --text-light: #90caf9;
+            --background: #0d1b33;
+            --card-bg: #1e2b47;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --border: #1565c0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header Styles */
+        header {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(76, 175, 80, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border: 1px solid rgba(197, 225, 165, 0.3);
+            position: relative;
+            z-index: 2;
+            transition: var(--transition);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .logo:hover {
+            transform: translateY(-2px);
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2em;
+            font-weight: 700;
+            color: var(--primary-dark);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        .logo-icon {
+            font-size: 2em;
+            color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 10px;
+            margin-right: 510px;
+        }
+
+        .nav-item {
+            padding: 10px 20px;
+            border-radius: 12px;
+            color: var(--primary-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item:hover {
+            background: rgba(241, 248, 233, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .nav-item.active:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        /* Games Layout */
+        .games-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .games-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .games-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3em;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        /* Card Styles */
+        .game-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(76, 175, 80, 0.2);
+        }
+
+        .game-image {
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+        }
+
+        .game-content {
+            padding: 25px;
+        }
+
+        .game-title {
+            font-size: 1.5em;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .game-description {
+            color: var(--text);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .game-features {
+            margin-bottom: 20px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--primary-light);
+            border-radius: 10px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: var(--text);
+        }
+
+        .play-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .play-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+        }
+
+        .difficulty {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .difficulty-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #e0e0e0;
+        }
+
+        .difficulty-dot.active {
+            background: var(--primary);
+        }
+
+        /* Achievements Section */
+        .achievements-section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            margin-top: 50px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2em;
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .achievement-card {
+            background: var(--primary-light);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .achievement-card.earned {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .achievement-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .achievement-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .achievement-desc {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 968px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .nav-menu {
+                margin-left: 0;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .games-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 10px;
+            }
+            
+            .logo-text {
+                font-size: 1.8em;
+            }
+            
+            .nav-item {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+            
+            .games-title {
+                font-size: 2.2em;
+            }
+            
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .achievements-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .section-title {
+                font-size: 1.6em;
+            }
+            
+            .achievements-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo" onclick="window.location.href='main-site.html'">
+            <div class="logo-icon">🌿</div>
+            <div class="logo-text">Garden Game</div>
+        </div>
+        
+        <div class="nav-menu">
+            <a href="main-site.html" class="nav-item">Главная</a>
+            <a href="profile.html" class="nav-item">Профиль</a>
+            <a href="shop.html" class="nav-item">Магазин</a>
+            <a href="friends.html" class="nav-item">Друзья</a>
+            <a href="games.html" class="nav-item active">Игры</a>
+            <a href="settings.html" class="nav-item">Настройки</a>
+        </div>
+    </header>
+
+    <div class="games-container">
+        <div class="games-header">
+            <h1 class="games-title">Игровая комната</h1>
+            <p>Выберите игру и начните свое садоводческое приключение!</p>
+        </div>
+
+        <div class="games-grid">
+            <div class="game-card">
+                <div class="game-image">🌻</div>
+                <div class="game-content">
+                    <h3 class="game-title">Цветочный матч</h3>
+                    <div class="difficulty">
+                        <div class="difficulty-dot active"></div>
+                        <div class="difficulty-dot active"></div>
+                        <div class="difficulty-dot"></div>
+                    </div>
+                    <p class="game-description">Находите пары одинаковых цветов в этой увлекательной игре на память. Развивайте внимание и получайте награды!</p>
+                    <div class="game-features">
+                        <div class="feature"><i class="fas fa-star"></i> Развивает память</div>
+                        <div class="feature"><i class="fas fa-coins"></i> Награды: монеты и опыт</div>
+                        <div class="feature"><i class="fas fa-clock"></i> Игра на время</div>
+                    </div>
+                    <div class="game-stats">
+                        <div class="stat">
+                            <div class="stat-value" id="matchHighScore">0</div>
+                            <div class="stat-label">Рекорд</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="matchPlays">0</div>
+                            <div class="stat-label">Сыграно раз</div>
+                        </div>
+                    </div>
+                    <button class="play-btn" onclick="window.location.href='flower-match.html'">Играть сейчас</button>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <div class="game-image">🌷</div>
+                <div class="game-content">
+                    <h3 class="game-title">Дизайн сада</h3>
+                    <div class="difficulty">
+                        <div class="difficulty-dot active"></div>
+                        <div class="difficulty-dot"></div>
+                        <div class="difficulty-dot"></div>
+                    </div>
+                    <p class="game-description">Создайте уникальный дизайн своего сада, расставляя растения и декорации. Поделитесь творением с друзьями!</p>
+                    <div class="game-features">
+                        <div class="feature"><i class="fas fa-palette"></i> Творческий подход</div>
+                        <div class="feature"><i class="fas fa-share"></i> Делитесь с друзьями</div>
+                        <div class="feature"><i class="fas fa-expand"></i> Неограниченные возможности</div>
+                    </div>
+                    <div class="game-stats">
+                        <div class="stat">
+                            <div class="stat-value" id="designsCount">0</div>
+                            <div class="stat-label">Создано</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="designLikes">0</div>
+                            <div class="stat-label">Лайков</div>
+                        </div>
+                    </div>
+                    <button class="play-btn" onclick="window.location.href='garden-design.html'">Создать сад</button>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <div class="game-image">🍃</div>
+                <div class="game-content">
+                    <h3 class="game-title">Уход за растениями</h3>
+                    <div class="difficulty">
+                        <div class="difficulty-dot active"></div>
+                        <div class="difficulty-dot active"></div>
+                        <div class="difficulty-dot active"></div>
+                    </div>
+                    <p class="game-description">Узнайте все о правильном уходе за растениями. Проходите задания и становитесь экспертом по садоводству!</p>
+                    <div class="game-features">
+                        <div class="feature"><i class="fas fa-graduation-cap"></i> Обучающая игра</div>
+                        <div class="feature"><i class="fas fa-seedling"></i> Практические знания</div>
+                        <div class="feature"><i class="fas fa-tasks"></i> Пошаговые задания</div>
+                    </div>
+                    <div class="game-stats">
+                        <div class="stat">
+                            <div class="stat-value" id="careLevel">1</div>
+                            <div class="stat-label">Уровень ухода</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="plantsSaved">0</div>
+                            <div class="stat-label">Спасено растений</div>
+                        </div>
+                    </div>
+                    <button class="play-btn" onclick="window.location.href='plant-care.html'">Учиться уходу</button>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <div class="game-image">❓</div>
+                <div class="game-content">
+                    <h3 class="game-title">Садовый квиз</h3>
+                    <div class="difficulty">
+                        <div class="difficulty-dot active"></div>
+                        <div class="difficulty-dot active"></div>
+                        <div class="difficulty-dot"></div>
+                    </div>
+                    <p class="game-description">Проверьте свои знания о растениях и садоводстве. Отвечайте на вопросы и зарабатывайте бонусы!</p>
+                    <div class="game-features">
+                        <div class="feature"><i class="fas fa-brain"></i> Проверка знаний</div>
+                        <div class="feature"><i class="fas fa-trophy"></i> Соревновательный режим</div>
+                        <div class="feature"><i class="fas fa-book"></i> База знаний</div>
+                    </div>
+                    <div class="game-stats">
+                        <div class="stat">
+                            <div class="stat-value" id="quizScore">0%</div>
+                            <div class="stat-label">Лучший результат</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="quizStreak">0</div>
+                            <div class="stat-label">Серия правильных</div>
+                        </div>
+                    </div>
+                    <button class="play-btn" onclick="window.location.href='quiz-game.html'">Начать квиз</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="achievements-section">
+            <h2 class="section-title">Достижения в играх</h2>
+            <div class="achievements-grid" id="achievementsGrid">
+                <!-- Достижения будут загружены через JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (!currentUser) {
+                window.location.href = 'registration.html';
+                return;
+            }
+
+            loadGameStats();
+            loadAchievements();
+            applyThemeSettings();
+        });
+
+        function loadGameStats() {
+            const userData = getUserData();
+            const stats = userData.gameStats || {};
+
+            document.getElementById('matchHighScore').textContent = stats.matchHighScore || 0;
+            document.getElementById('matchPlays').textContent = stats.matchPlays || 0;
+            document.getElementById('designsCount').textContent = stats.designsCount || 0;
+            document.getElementById('designLikes').textContent = stats.designLikes || 0;
+            document.getElementById('careLevel').textContent = stats.careLevel || 1;
+            document.getElementById('plantsSaved').textContent = stats.plantsSaved || 0;
+            document.getElementById('quizScore').textContent = (stats.quizScore || 0) + '%';
+            document.getElementById('quizStreak').textContent = stats.quizStreak || 0;
+        }
+
+        function loadAchievements() {
+            const grid = document.getElementById('achievementsGrid');
+            const userData = getUserData();
+            const achievements = userData.achievements || [];
+
+            const allAchievements = [
+                { id: 1, name: "Первый шаг", icon: "👣", desc: "Завершите первую игру", earned: achievements.includes(1) },
+                { id: 2, name: "Цветочный эксперт", icon: "🌺", desc: "Соберите 10 пар в матче", earned: achievements.includes(2) },
+                { id: 3, name: "Дизайнер", icon: "🎨", desc: "Создайте 5 дизайнов сада", earned: achievements.includes(3) },
+                { id: 4, name: "Садовник", icon: "👨‍🌾", desc: "Достигните 5 уровня ухода", earned: achievements.includes(4) },
+                { id: 5, name: "Эрудит", icon: "📚", desc: "Правильно ответьте на 20 вопросов", earned: achievements.includes(5) },
+                { id: 6, name: "Коллекционер", icon: "🏆", desc: "Соберите все достижения", earned: achievements.length === 6 }
+            ];
+
+            grid.innerHTML = '';
+            allAchievements.forEach(ach => {
+                const card = document.createElement('div');
+                card.className = `achievement-card ${ach.earned ? 'earned' : ''}`;
+                card.innerHTML = `
+                    <div class="achievement-icon">${ach.icon}</div>
+                    <div class="achievement-name">${ach.name}</div>
+                    <div class="achievement-desc">${ach.desc}</div>
+                    ${ach.earned ? '<div style="margin-top: 10px;">⭐ Получено</div>' : ''}
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function getUserData() {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            return users.find(u => u.email === currentUser.email) || {};
+        }
+
+        function applyThemeSettings() {
+            const settings = JSON.parse(localStorage.getItem('appSettings')) || {};
+            
+            if (settings.theme) {
+                document.body.setAttribute('data-theme', settings.theme);
+                
+                if (settings.darkMode && settings.theme !== 'dark') {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            }
+            
+            if (settings.fontSize) {
+                document.body.style.fontSize = settings.fontSize + 'px';
+            }
+            if (settings.fontFamily) {
+                document.body.style.fontFamily = settings.fontFamily + ', sans-serif';
+            }
+        }
+    </script>
+</body>
+</html>
